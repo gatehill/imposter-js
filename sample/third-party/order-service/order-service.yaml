@@ -1,0 +1,67 @@
+# This is an example OpenAPI specification
+# It illustrates a dependency of the Petstore OpenDep specification.
+---
+openapi: "3.0.1"
+
+info:
+  title: Sample Petstore order service
+  description: This is a sample OpenAPI specification describing a service for placing orders.
+  contact:
+    name: Pete Cornish
+    url: https://github.com/opendeps
+    email: opendeps@example.com
+  version: "2.0.0"
+
+paths:
+  /orders:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                required:
+                  - sku
+                properties:
+                  sku:
+                    type: string
+            examples:
+              orderExample:
+                value:
+                  [
+                      { sku: "fb01" },
+                      { sku: "br06" }
+                  ]
+      responses:
+        '201':
+          description: Places an order
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - total
+                properties:
+                  total:
+                    type: number
+                    example: 10.00
+
+  /healthz:
+    get:
+      responses:
+        '200':
+          description: Healthcheck endpoint
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                success:
+                  value: "ok"
+
+servers:
+  - description: Local development
+    url: http://localhost:8080

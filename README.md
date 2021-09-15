@@ -28,15 +28,18 @@ Here's an example using Jest:
 
 
 ```js
+import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
+import imposter from "imposter";
+
 const mocks = imposter();
 
 jest.setTimeout(30000);
 
-let orderService;
-
 beforeAll(async () => {
     // path to Imposter config
-    const configDir = `${process.cwd()}/order-service`;
+    const configDir = `${process.cwd()}/order-api`;
+
+    // start the mocks (returns a Promise)
     return mocks.start(configDir, 8080);
 });
 
@@ -45,16 +48,18 @@ afterAll(async () => {
 })
 
 it('places an order', async () => {
-    let orderItems = [
-        {sku: "fb01"},
-        {sku: "br06"},
-    ];
+    // configure the unit under test
+    const orderService = new OrderService('http://localhost:8080/orders');
+
     // call your unit under test, which invokes the mock
-    const orderService = OrderService(`http://localhost:8080/orders`);
-    const confirmation = await orderService.placeOrder(orderItems);
+    const confirmation = await orderService.placeOrder('product-05');
+
+    // assert values returned to the unit under test by the mock
     expect(confirmation.total).toEqual(18.00);
 });
 ```
+
+> See the [sample](./sample) directory for a working Node.js project.
 
 ## Prerequisities
 

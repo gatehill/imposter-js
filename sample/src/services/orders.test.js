@@ -22,7 +22,7 @@ afterAll(async () => {
 })
 
 it('places an order', async () => {
-    let orderItems = [
+    const orderItems = [
         {sku: "fb01"},
         {sku: "br06"},
     ];

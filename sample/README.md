@@ -1,7 +1,7 @@
 Sample project for Imposter with Jest
 =====================================
 
-## Prerequisities
+## Prerequisites
 
 - Node.js 12+
 - [Imposter CLI](https://github.com/gatehill/imposter-cli)

@@ -6,7 +6,7 @@ Wrapper for using the [Imposter mock engine](https://github.com/outofcoffee/impo
 ## Usage
 
 ```js
-const imposter = require('imposter');
+const imposter = require('@imposter-js/imposter');
 const mocks = imposter();
 
 // start mock
@@ -26,9 +26,8 @@ mocks.stopAll();
 
 Here's an example using Jest:
 
-
 ```js
-const imposter = require('imposter');
+const imposter = require('@imposter-js/imposter');
 const mocks = imposter();
 
 jest.setTimeout(30000);
@@ -59,13 +58,21 @@ it('places an order', async () => {
 
 > See the [sample](./sample) directory for a working Node.js project.
 
-## Prerequisities
+## Prerequisites
 
 Install [Imposter CLI](https://github.com/gatehill/imposter-cli):
+
+If you have Homebrew installed:
 
 ```shell
 brew tap gatehill/imposter
 brew install imposter
+```
+
+Or, use this one liner (macOS and Linux only):
+
+```shell
+curl -L https://raw.githubusercontent.com/gatehill/imposter-cli/main/install/install_imposter.sh | bash -
 ```
 
 ## Acknowledgements

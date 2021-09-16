@@ -28,9 +28,7 @@ Here's an example using Jest:
 
 
 ```js
-import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
-import imposter from "imposter";
-
+const imposter = require('imposter');
 const mocks = imposter();
 
 jest.setTimeout(30000);

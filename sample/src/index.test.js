@@ -1,6 +1,6 @@
 import App from "./index";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
-import imposter from "./imposter";
+import imposter from "imposter/src";
 
 const mocks = imposter();
 

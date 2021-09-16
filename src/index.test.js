@@ -1,19 +1,19 @@
-import stock from "./stock";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
-import imposter from "imposter/src";
+import imposter from "./index";
+import axios from "axios";
 
 const mocks = imposter();
 
 jest.setTimeout(30000);
 
-let stockService;
+let baseUrl;
 
 beforeAll(async () => {
-    const configDir = `${process.cwd()}/third-party/stock-service`;
+    const configDir = `${process.cwd()}/test_data`;
     const mock = mocks.start(configDir, 8080);
 
     // set the base URL
-    stockService = stock('http://localhost:8080');
+    baseUrl = `http://localhost:8080`;
     return mock;
 });
 
@@ -22,7 +22,10 @@ afterAll(async () => {
 })
 
 it('fetches available stock', async () => {
-    const products = await stockService.listStock();
+    const response = await axios.get(`${baseUrl}/products`);
+    expect(response.status).toEqual(200);
+
+    const products = response.data;
     expect(products).toHaveLength(2);
     expect(products[0].name).toEqual('Food bowl');
 });

@@ -1,7 +1,7 @@
-Imposter JavaScript wrapper
-===========================
+Imposter JavaScript Bindings
+============================
 
-Wrapper for using the [Imposter mock engine](https://github.com/outofcoffee/imposter/) in JavaScript using [Jest](https://jestjs.io/).
+Bindings for using the [Imposter mock engine](https://github.com/outofcoffee/imposter/) in JavaScript/Node.js.
 
 ## Usage
 
@@ -22,7 +22,42 @@ console.log(response.data);
 mocks.stopAll();
 ```
 
-### Example
+## Quickstart
+
+Imposter is available as an [npm package](https://www.npmjs.com/package/@imposter-js/imposter).
+
+Install with npm:
+
+    npm install --save-dev @imposter-js/imposter
+
+Or add to your `package.json` as a dev dependency:
+
+```json
+"devDependencies": {
+  "@imposter-js/imposter": "*"
+}
+```
+
+> See available versions on the [npm registry](https://www.npmjs.com/package/@imposter-js/imposter?activeTab=versions)
+
+## Prerequisites
+
+Install [Imposter CLI](https://github.com/gatehill/imposter-cli):
+
+If you have Homebrew installed:
+
+```shell
+brew tap gatehill/imposter
+brew install imposter
+```
+
+Or, use this one liner (macOS and Linux only):
+
+```shell
+curl -L https://raw.githubusercontent.com/gatehill/imposter-cli/main/install/install_imposter.sh | bash -
+```
+
+## Example with Jest
 
 Here's an example using Jest:
 
@@ -57,23 +92,6 @@ it('places an order', async () => {
 ```
 
 > See the [sample](./sample) directory for a working Node.js project.
-
-## Prerequisites
-
-Install [Imposter CLI](https://github.com/gatehill/imposter-cli):
-
-If you have Homebrew installed:
-
-```shell
-brew tap gatehill/imposter
-brew install imposter
-```
-
-Or, use this one liner (macOS and Linux only):
-
-```shell
-curl -L https://raw.githubusercontent.com/gatehill/imposter-cli/main/install/install_imposter.sh | bash -
-```
 
 ## Acknowledgements
 

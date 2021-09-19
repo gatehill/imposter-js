@@ -1,4 +1,4 @@
-import petNames from "./petNames";
+import petnames from "./petnames";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
 import imposter from "imposter/src";
 
@@ -19,7 +19,7 @@ beforeAll(async () => {
         .build();
 
     // set the base URL
-    petNameService = petNames('http://localhost:8082');
+    petNameService = petnames('http://localhost:8082');
     return mock.start();
 });
 

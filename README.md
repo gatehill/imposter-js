@@ -9,8 +9,13 @@ Bindings for using the [Imposter mock engine](https://github.com/outofcoffee/imp
 const imposter = require('@imposter-js/imposter');
 const mocks = imposter();
 
-// start mock
-const mock = mocks.start('/path/to/config', 8080);
+// build a mock of an OpenAPI spec
+const mock = mocks.builder()
+    .withPort(8080)
+    .withOpenApiSpec('/path/to/openapi_spec.yaml')
+    .build();
+
+await mock.start();
 
 // call the mock
 const response = await axios.get('http://localhost:8080/products');
@@ -71,7 +76,8 @@ beforeAll(async () => {
     // path to Imposter config
     const configDir = `${process.cwd()}/order-api`;
 
-    // start the mocks (returns a Promise)
+    // start the mocks (returns a Promise) using an existing
+    // Imposter config file in the 'order-api' directory
     return mocks.start(configDir, 8080);
 });
 

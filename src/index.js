@@ -4,6 +4,10 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 
+// Don't use the global console - this gets
+// overridden by Jest and makes output chatty.
+const nodeConsole = require("console");
+
 class MockBuilder {
     mockManager;
     config = {};
@@ -83,7 +87,7 @@ class MockBuilder {
     build() {
         const mockConfigPath = path.join(this.configDir, 'imposter-config.json');
         fs.writeFileSync(mockConfigPath, JSON.stringify(this.config, null, '  '));
-        console.debug(`Wrote mock config to: ${mockConfigPath}`);
+        nodeConsole.debug(`Wrote mock config to: ${mockConfigPath}`);
         return this.mockManager.prepare(this.configDir, this.port);
     }
 }
@@ -92,6 +96,9 @@ class ConfiguredMock {
     configDir;
     port;
     logVerbose = false;
+    logToFile = true;
+    logFilePath;
+    logFileStream;
     proc;
 
     constructor(configDir, port) {
@@ -106,26 +113,44 @@ class ConfiguredMock {
         if (this.proc) {
             throw new Error(`Mock on port ${this.port} already started`);
         }
+        let proc;
         try {
-            this.proc = spawn('imposter', [
+            proc = this.proc = spawn('imposter', [
                 'up', this.configDir,
-                '-p', this.port,
+                `--port=${this.port}`,
+                '--auto-restart=false',
             ]);
         } catch (e) {
             throw new Error(`Error spawning Imposter process: ${e}`)
         }
 
-        if (this.logVerbose) {
-            this.proc.stdout.on('data', chunk => console.debug(chunk.toString()));
-            this.proc.stderr.on('data', chunk => console.warn(chunk.toString()));
+        this.configureLogging(proc);
+        await this.waitUntilReady(proc);
+        return this;
+    }
+
+    configureLogging(proc) {
+        if (this.logToFile) {
+            this.logFilePath = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'imposter')), 'imposter.log');
+            this.logFileStream = fs.createWriteStream(this.logFilePath);
+            nodeConsole.debug(`Logging to ${this.logFilePath}`);
         }
 
-        console.debug(`Waiting for mock server to come up on port ${this.port}`);
+        proc.stdout.on('data', chunk => {
+            writeChunk(chunk, this.logVerbose, this.logToFile, nodeConsole.debug, this.logFileStream);
+        });
+        proc.stderr.on('data', chunk => {
+            writeChunk(chunk, this.logVerbose, this.logToFile, nodeConsole.warn, this.logFileStream);
+        });
+    }
+
+    async waitUntilReady(proc) {
+        nodeConsole.debug(`Waiting for mock server to come up on port ${this.port}`);
         let ready = false;
         while (!ready) {
-            if (this.proc.exitCode) {
-                const verbosePrompt = this.logVerbose ? "" : "\nTry starting with .verbose() to see details.";
-                throw new Error(`Failed to start mock engine on port ${this.port}. Exit code: ${this.proc.exitCode}${verbosePrompt}`);
+            if (proc.exitCode) {
+                const verbosePrompt = this.logVerbose ? "" : '\nTry starting with .verbose() for more details.';
+                throw new Error(`Failed to start mock engine on port ${this.port}. Exit code: ${proc.exitCode}\nSee log file: ${this.logFilePath}${verbosePrompt}`);
             }
             try {
                 const response = await axios.get(`http://localhost:${this.port}/system/status`);
@@ -133,23 +158,26 @@ class ConfiguredMock {
                     ready = true;
                 }
             } catch (ignored) {
-                await sleep(100);
+                await sleep(200);
             }
         }
-        console.debug('Mock server is up!')
-        return this;
+        nodeConsole.debug('Mock server is up!');
     }
 
     stop() {
         if (!this.proc || !this.proc.pid) {
-            console.debug(`Mock server on port ${this.port} was not running`);
-            return;
+            nodeConsole.debug(`Mock server on port ${this.port} was not running`);
+        } else {
+            try {
+                nodeConsole.debug(`Stopping mock server with pid ${this.proc.pid}`);
+                this.proc.kill();
+            } catch (e) {
+                nodeConsole.warn(`Error stopping mock server with pid ${this.proc.pid}`, e);
+            }
         }
-        try {
-            console.debug(`Stopping mock server with pid ${this.proc.pid}`);
-            this.proc.kill();
-        } catch (e) {
-            console.warn(`Error stopping mock server with pid ${this.proc.pid}`, e);
+
+        if (this.logFileStream) {
+            this.logFileStream.close();
         }
     }
 
@@ -221,12 +249,27 @@ class MockManager {
     }
 }
 
-module.exports = () => {
-    return new MockManager();
+function writeChunk(chunk, logVerbose, logToFile, consoleFn, logFileStream) {
+    if (!chunk) {
+        return;
+    }
+    if (logVerbose) {
+        consoleFn(chunk.toString().trim());
+    }
+    if (logToFile) {
+        try {
+            logFileStream.write(chunk);
+        } catch (ignored) {
+        }
+    }
 }
 
 function sleep(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
+}
+
+module.exports = () => {
+    return new MockManager();
 }

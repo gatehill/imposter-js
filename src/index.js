@@ -68,6 +68,16 @@ class MockBuilder {
     }
 
     /**
+     * Sets/overwrites configuration with `config`.
+     * @param config
+     * @return {MockBuilder}
+     */
+    withConfig(config) {
+        this.config = config;
+        return this;
+    }
+
+    /**
      * @return {ConfiguredMock}
      */
     build() {

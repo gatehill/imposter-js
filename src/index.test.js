@@ -39,3 +39,30 @@ it('builds a mock from a bare OpenAPI spec', async () => {
     expect(names).toHaveLength(2);
     expect(names[0]).toEqual('Fluffy');
 });
+
+it('builds a mock from config object', async () => {
+    const config = {
+        plugin: 'rest',
+        resources: [
+            {
+                path: "/example",
+                method: 'POST',
+                response: {
+                    statusCode: 201,
+                    staticData: 'Hello world'
+                }
+            }
+        ]
+    };
+
+    const mock = mocks.builder()
+        .withPort(8082)
+        .withConfig(config)
+        .build();
+
+    await mock.start();
+
+    const response = await axios.post(`${mock.baseUrl()}/example`);
+    expect(response.status).toEqual(201);
+    expect(response.data).toEqual('Hello world');
+});

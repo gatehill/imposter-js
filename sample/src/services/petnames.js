@@ -9,7 +9,7 @@ class PetNameService {
 
     async suggestNames() {
         const response = await axios.get(`${this.baseUrl}/names`);
-        console.log(`names: ${JSON.stringify(response.data)}`);
+        console.log(`names:`, response.data);
         return response.data;
     }
 }

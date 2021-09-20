@@ -9,7 +9,7 @@ class StockService {
 
     async listStock() {
         const response = await axios.get(`${this.baseUrl}/products`);
-        console.log(`products: ${JSON.stringify(response.data)}`);
+        console.log(`products:`, response.data);
         return response.data;
     }
 }

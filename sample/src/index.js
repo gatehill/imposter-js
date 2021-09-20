@@ -18,7 +18,7 @@ class App {
             {sku: products[0].sku}
         ];
         const confirmation = await this.orderService.placeOrder(orderItems);
-        console.log(`order confirmation: ${confirmation}`);
+        console.log(`order confirmation:`, confirmation);
         return confirmation;
     };
 }

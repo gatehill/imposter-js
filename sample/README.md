@@ -10,7 +10,8 @@ Sample project for Imposter with Jest
 
 Run tests as follows:
 
-	npm test
+	npm install
+    npm test
 
 ## Details
 

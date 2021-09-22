@@ -1,7 +1,9 @@
-Imposter JavaScript Bindings
-============================
+Imposter Mock Engine
+====================
 
 Bindings for using the [Imposter mock engine](https://github.com/outofcoffee/imposter/) in JavaScript/Node.js.
+
+Embed live HTTP mocks within your tests, based on OpenAPI specification files or plain REST APIs.
 
 ## Usage
 
@@ -49,7 +51,7 @@ Or add to your `package.json` as a dev dependency:
 ## Prerequisites
 
 1. Install [Imposter CLI](https://github.com/gatehill/imposter-cli/blob/main/docs/install.md)
-2. Ensure you have _either_ [Docker installed](https://docs.docker.com/get-docker/) and running, or a [JVM installed](https://github.com/gatehill/imposter-cli/blob/main/docs/install_jvm.md) (Java 8+)
+2. Ensure you have _either_ [Docker installed](https://docs.docker.com/get-docker/) and running, or a [JVM installed](https://github.com/gatehill/imposter-cli/blob/main/docs/jvm_engine.md).
 
 ## Example with Jest
 
@@ -92,7 +94,21 @@ it('places an order', async () => {
 - [Mock engine configuration](https://github.com/gatehill/imposter-js/blob/main/docs/config.md)
 - [Imposter user documentation](https://outofcoffee.github.io/imposter)
 
+## Features
+
+* run standalone mocks in place of real systems
+* turn an OpenAPI/Swagger file into a mock API for testing or QA (even before the real API is built)
+* decouple your integration tests from the cloud/various back-end systems and take control of your dependencies
+* validate your API requests against an OpenAPI specification
+
+Send dynamic responses:
+
+- Provide mock responses using static files or customise behaviour based on characteristics of the request.
+- Power users can control mock responses with JavaScript.
+
 ## Acknowledgements
+
+This project is only possible thanks to the following:
 
 - [Imposter](https://github.com/outofcoffee/imposter)
 - [Jest](https://jestjs.io/)

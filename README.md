@@ -6,8 +6,7 @@ Bindings for using the [Imposter mock engine](https://github.com/outofcoffee/imp
 ## Usage
 
 ```js
-const imposter = require('@imposter-js/imposter');
-const mocks = imposter();
+const {mocks} = require('@imposter-js/imposter');
 
 // build a mock of an OpenAPI spec
 const mock = mocks.builder()
@@ -26,6 +25,8 @@ console.log(response.data);
 // stop the mock
 mocks.stopAll();
 ```
+
+> See the [sample](https://github.com/gatehill/imposter-js/tree/main/sample) directory for a working Node.js project.
 
 ## Quickstart
 
@@ -47,28 +48,15 @@ Or add to your `package.json` as a dev dependency:
 
 ## Prerequisites
 
-Install [Imposter CLI](https://github.com/gatehill/imposter-cli):
-
-If you have Homebrew installed:
-
-```shell
-brew tap gatehill/imposter
-brew install imposter
-```
-
-Or, use this one liner (macOS and Linux only):
-
-```shell
-curl -L https://raw.githubusercontent.com/gatehill/imposter-cli/main/install/install_imposter.sh | bash -
-```
+1. Install [Imposter CLI](https://github.com/gatehill/imposter-cli/blob/main/docs/install.md)
+2. Ensure you have _either_ [Docker installed](https://docs.docker.com/get-docker/) and running, or a [JVM installed](https://github.com/gatehill/imposter-cli/blob/main/docs/install_jvm.md) (Java 8+)
 
 ## Example with Jest
 
 Here's an example using Jest:
 
 ```js
-const imposter = require('@imposter-js/imposter');
-const mocks = imposter();
+const {mocks} = require('@imposter-js/imposter');
 
 jest.setTimeout(30000);
 
@@ -97,7 +85,12 @@ it('places an order', async () => {
 });
 ```
 
-> See the [sample](./sample) directory for a working Node.js project.
+> See the [sample](https://github.com/gatehill/imposter-js/tree/main/sample) directory for a working Node.js project.
+
+## Documentation
+
+- [Mock engine configuration](https://github.com/gatehill/imposter-js/blob/main/docs/config.md)
+- [Imposter user documentation](https://outofcoffee.github.io/imposter)
 
 ## Acknowledgements
 

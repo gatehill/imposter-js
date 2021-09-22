@@ -14,7 +14,10 @@ Run tests as follows:
 
 ## Details
 
-Two third party services are defined using OpenAPI specifications under the `third-party` directory:
+Three third party services are defined using OpenAPI specifications under the `third-party` directory:
 
 - order-service
+- pet-name-service
 - stock-service
+
+Some are 'bare' directories containing only OpenAPI files, and others have Imposter configuration files, dynamic scripts etc. 

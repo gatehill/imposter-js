@@ -1,8 +1,6 @@
 import {afterAll, expect, it, jest} from '@jest/globals';
-import imposter from "./index";
+import {determineCliVersion, mocks} from "./index";
 import axios from "axios";
-
-const mocks = imposter();
 
 jest.setTimeout(30000);
 
@@ -65,4 +63,10 @@ it('builds a mock from config object', async () => {
     const response = await axios.post(`${mock.baseUrl()}/example`);
     expect(response.status).toEqual(201);
     expect(response.data).toEqual('Hello world');
+});
+
+it('can determine the CLI version', async () => {
+    const version = await determineCliVersion();
+    console.debug(`CLI version: ${JSON.stringify(version)}`);
+    expect(version.major).toEqual(0);
 });

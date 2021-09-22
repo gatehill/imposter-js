@@ -1,8 +1,11 @@
 import App from "./index";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
-import imposter from "imposter/src";
 
-const mocks = imposter();
+// Important: In your own project, change this to:
+// import {mocks} from "@imposter-js/imposter";
+// or:
+// const {mocks} = require("@imposter-js/imposter");
+import {mocks} from "imposter/src";
 
 const thirdParties = {
     stockService: {dir: 'stock-service', port: 9080},

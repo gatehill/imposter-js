@@ -1,6 +1,9 @@
-import stock from "./services/stock";
-import orders from "./services/orders";
+import stock from "./stock";
+import orders from "./orders";
 
+/**
+ * A simple application that chains calls for some of the services.
+ */
 class App {
     stockService;
     orderService;
@@ -10,6 +13,11 @@ class App {
         this.orderService = orders(config.ordersBaseUrl);
     }
 
+    /**
+     * Retrieve the products in stock, then order the first one.
+     *
+     * @returns {Promise<Object>}
+     */
     orderItemInStock = async () => {
         const products = await this.stockService.listStock();
 

@@ -1,8 +1,11 @@
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
-import imposter from "imposter/src";
 import orders from "./orders";
 
-const mocks = imposter();
+// Important: In your own project, change this to:
+// import {mocks} from "@imposter-js/imposter";
+// or:
+// const {mocks} = require("@imposter-js/imposter");
+import {mocks} from "imposter/src";
 
 jest.setTimeout(30000);
 

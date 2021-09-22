@@ -13,12 +13,30 @@ Run tests as follows:
 	npm install
     npm test
 
-## Details
+## API details
 
-Three third party services are defined using OpenAPI specifications under the `third-party` directory:
+The following third party services are mocked:
 
-- order-service
-- pet-name-service
-- stock-service
+### order-service
 
-Some are 'bare' directories containing only OpenAPI files, and others have Imposter configuration files, dynamic scripts etc. 
+Defined using OpenAPI specifications under the `third-party/order-service` directory.
+
+Also contains Imposter configuration files, dynamic scripts to synthesise an order confirmation.
+
+### pet-name-service
+
+A bare directory under `third-party/pet-name-service` containing only an OpenAPI file, with the Imposter configuration generated when the mock starts.
+
+### stock-service
+
+Defined using OpenAPI specifications under the `third-party/stock-service` directory.
+
+Also contains Imposter configuration files, but no dynamic scripts.
+
+### user-service
+
+A mock defined entirely within the [Jest test](./src/users.test.js) - no OpenAPI specification, no Imposter configuration - all done when Jest executes the test.
+
+## Application details
+
+A simple application is defined in `index.js` that chains calls for some of the above services.

@@ -1,9 +1,9 @@
 import {spawn} from "child_process";
-import axios from "axios";
 import fs from "fs";
 import os from "os";
 import path from "path";
 import {fileUtils} from "./fileutils";
+import {httpGet} from "./healthcheck";
 
 // Don't use the global console - this gets
 // overridden by Jest and makes output chatty.
@@ -164,7 +164,7 @@ class ConfiguredMock {
                 throw new Error(`Failed to start mock engine on port ${this.port}. Exit code: ${proc.exitCode}\nSee log file: ${this.logFilePath}${verbosePrompt}`);
             }
             try {
-                const response = await axios.get(`http://localhost:${this.port}/system/status`);
+                const response = await httpGet(`http://localhost:${this.port}/system/status`);
                 if (response.status === 200) {
                     ready = true;
                 }

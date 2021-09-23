@@ -1,10 +1,9 @@
-import {exec, spawn} from "child_process";
+import {spawn} from "child_process";
 import axios from "axios";
 import fs from "fs";
 import os from "os";
-import path, {dirname} from "path";
-
-const {constants, promises: {access}} = require('fs');
+import path from "path";
+import {fileUtils} from "./fileutils";
 
 // Don't use the global console - this gets
 // overridden by Jest and makes output chatty.
@@ -111,12 +110,12 @@ class ConfiguredMock {
     /**
      * @return {Promise<ConfiguredMock>}
      */
-    start = async () => {
+    async start() {
         if (this.proc) {
             throw new Error(`Mock on port ${this.port} already started`);
         }
 
-        const localConfigFile = await findLocalConfig();
+        const localConfigFile = await fileUtils.discoverLocalConfig();
 
         let proc;
         try {
@@ -282,114 +281,10 @@ function sleep(ms) {
     });
 }
 
-/**
- * Determines the version of the CLI subcomponent.
- *
- * @param componentName {string}
- * @returns {Promise<object>}
- */
-function determineVersion(componentName) {
-    return new Promise((resolve, reject) => {
-        try {
-            exec('imposter version', (error, stdout, stderr) => {
-                const output = `${stdout}\n${stderr}`;
-                if (error) {
-                    reject(new Error(`Error determining version: ${error}\n${output}`));
-                    return;
-                }
-                try {
-                    /*
-                     * Parse CLI output in the form:
-                     *
-                     * imposter-cli 0.1.0
-                     * imposter-engine 0.1.0
-                     *
-                     * ...into an array of Strings containing the SemVer components:
-                     * [ "0", "1", "0" ]
-                     */
-                    const version = output.split('\n')
-                        .filter(line => line.match(componentName))
-                        .map(cliVersion => cliVersion.split(' ')[1].trim().split('.'))[0];
-
-                    resolve({
-                        major: Number(version[0]),
-                        minor: Number(version[1]),
-                        revision: Number(version[2]),
-                    });
-
-                } catch (e) {
-                    reject(new Error(`Error parsing version: ${e}`));
-                }
-            });
-        } catch (e) {
-            reject(new Error(`Error spawning Imposter process: ${e}`));
-        }
-    });
-}
-
-/**
- * Determine the version of the CLI.
- *
- * @returns {Promise<object>}
- */
-function determineCliVersion() {
-    return determineVersion(/imposter-cli/);
-}
-
-/**
- * Runs the `block` if the CLI version is equal to or greater than the specified version.
- *
- * @param major {number}
- * @param minor {number}
- * @param block {function}
- * @returns {Promise<*|undefined>}
- */
-async function runIfVersionAtLeast(major, minor, block) {
-    const cliVersion = await determineCliVersion();
-    if (cliVersion.major >= major && cliVersion.minor >= minor) {
-        return await block();
-    }
-    return undefined;
-}
-
-/**
- * Searches the current working directory and the module's project directory
- * for a CLI configuration file.
- *
- * @returns {Promise<string|undefined|null>}
- */
-async function findLocalConfig() {
-    return await runIfVersionAtLeast(0, 6, async () => {
-        const searchPaths = [
-            await getPkgJsonDir(),
-            process.cwd(),
-        ];
-        const configs = searchPaths
-            .map(searchPath => path.join(searchPath, 'imposter.config.json'))
-            .filter(fs.existsSync);
-
-        return configs.length > 0 ? configs[0] : null;
-    });
-}
-
-/**
- * Determine the path to the module's project directory.
- *
- * @returns {Promise<string>}
- */
-async function getPkgJsonDir() {
-    for (let path of module.paths) {
-        try {
-            let prospectivePkgJsonDir = dirname(path);
-            await access(path, constants.F_OK);
-            return prospectivePkgJsonDir;
-        } catch (ignored) {
-        }
-    }
-}
-
 const defaultMockManager = new MockManager();
 
-export default () => defaultMockManager;
-
-export {defaultMockManager as mocks, determineCliVersion};
+export default () => {
+    nodeConsole.warn('Using the default export is deprecated - import/require {mocks} from this module instead');
+    return defaultMockManager;
+};
+export {defaultMockManager as mocks};

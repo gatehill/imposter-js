@@ -1,6 +1,7 @@
 import {afterAll, expect, it, jest} from '@jest/globals';
 import {mocks} from "../index";
 import axios from "axios";
+import {MockManager} from "../mock-manager";
 
 jest.setTimeout(30000);
 
@@ -67,5 +68,5 @@ it('builds a mock from config object', async () => {
 
 it('returns deprecated manager', async () => {
     const legacyManager = require('../index').default();
-    expect(legacyManager).toBeTruthy();
+    expect(legacyManager).toBeInstanceOf(MockManager);
 });

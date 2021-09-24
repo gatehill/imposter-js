@@ -2,8 +2,6 @@ import path, {dirname} from "path";
 import fs, {constants} from "fs";
 import {versionReader} from "./version";
 
-const {promises: {access}} = require('fs');
-
 class FileUtils {
     pkgJsonDir;
 
@@ -14,7 +12,7 @@ class FileUtils {
             for (let path of module.paths) {
                 try {
                     let prospectivePkgJsonDir = dirname(path);
-                    await access(path, constants.F_OK);
+                    await fs.promises.access(path, constants.F_OK);
                     this.pkgJsonDir = prospectivePkgJsonDir;
                     break
                 } catch (ignored) {

@@ -50,7 +50,7 @@ export class ConfiguredMock {
                     args.push(`--config=${localConfigFile}`);
                 }
                 const proc = spawn('imposter', args);
-                this.listenForEvents(proc, reject);
+                await this.listenForEvents(proc, reject);
 
                 await this.waitUntilReady(proc);
                 resolve(proc);
@@ -63,7 +63,7 @@ export class ConfiguredMock {
         return this;
     }
 
-    listenForEvents(proc, reject) {
+    async listenForEvents(proc, reject) {
         proc.on('error', err => {
             reject(new Error(`Error running 'imposter' command. Is Imposter CLI installed?\n${err}`));
         }).on('exit', (code) => {
@@ -73,7 +73,7 @@ export class ConfiguredMock {
             }
         });
         if (this.logToFile) {
-            this.logFilePath = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'imposter')), 'imposter.log');
+            this.logFilePath = path.join(await fs.promises.mkdtemp(path.join(os.tmpdir(), 'imposter')), 'imposter.log');
             this.logFileStream = fs.createWriteStream(this.logFilePath);
             nodeConsole.debug(`Logging to ${this.logFilePath}`);
         }
@@ -138,7 +138,7 @@ export class ConfiguredMock {
     }
 }
 
-function buildDebugAdvice(logToFile, logVerbose, logFilePath) {
+export function buildDebugAdvice(logToFile, logVerbose, logFilePath) {
     let advice = '';
     if (logToFile) {
         advice += `\nSee log file: ${logFilePath}`;
@@ -152,7 +152,7 @@ function buildDebugAdvice(logToFile, logVerbose, logFilePath) {
     return advice;
 }
 
-function writeChunk(chunk, logVerbose, logToFile, consoleFn, logFileStream) {
+export function writeChunk(chunk, logVerbose, logToFile, consoleFn, logFileStream) {
     if (!chunk) {
         return;
     }

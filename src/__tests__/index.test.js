@@ -10,7 +10,7 @@ afterAll(async () => {
 });
 
 it('builds a mock from an Imposter config dir', async () => {
-    const configDir = `${process.cwd()}/test_data/full_config`;
+    const configDir = `${__dirname}/testdata/full_config`;
     const mock = await mocks.start(configDir, 8080);
 
     const response = await axios.get(`${mock.baseUrl()}/products`);
@@ -22,7 +22,7 @@ it('builds a mock from an Imposter config dir', async () => {
 });
 
 it('builds a mock from a bare OpenAPI spec', async () => {
-    const specFile = `${process.cwd()}/test_data/bare_openapi/pet-name-service.yaml`;
+    const specFile = `${__dirname}/testdata/bare_openapi/pet-name-service.yaml`;
     const mock = mocks.builder()
         .withPort(8081)
         .withOpenApiSpec(specFile)

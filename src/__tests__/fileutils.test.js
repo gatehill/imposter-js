@@ -9,12 +9,12 @@ beforeAll(async () => {
 
 it('can discover local config file', () => {
     const searchPaths = [
-        path.join(process.cwd(), 'src', '__tests__', 'testdata'),
+        path.join(__dirname, 'testdata', 'cli_config'),
     ];
     const localConfig = fileUtils.discoverLocalConfig(searchPaths);
 
     // check path
-    expect(localConfig).toContain('/testdata/imposter.config.json');
+    expect(localConfig).toContain('/testdata/cli_config/imposter.config.json');
 
     // check file exists
     expect(fs.existsSync(localConfig)).toBe(true);
@@ -22,7 +22,7 @@ it('can discover local config file', () => {
 
 it('returns null if no local config found', () => {
     const searchPaths = [
-        path.join(process.cwd(), 'invalid_dir'),
+        path.join(__dirname, 'invalid_dir'),
     ];
     const localConfig = fileUtils.discoverLocalConfig(searchPaths);
 

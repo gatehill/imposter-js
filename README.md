@@ -63,8 +63,8 @@ const {mocks} = require('@imposter-js/imposter');
 jest.setTimeout(30000);
 
 beforeAll(async () => {
-    // path to Imposter config
-    const configDir = `${process.cwd()}/order-api`;
+    // path to Imposter config directory, relative to the test file
+    const configDir = `${__dirname}/../order-api`;
 
     // start the mocks (returns a Promise) using an existing
     // Imposter config file in the 'order-api' directory

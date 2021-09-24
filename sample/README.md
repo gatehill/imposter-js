@@ -21,7 +21,7 @@ The following third party services are mocked:
 
 Defined using OpenAPI specifications under the `third-party/order-service` directory.
 
-Also contains Imposter configuration files, dynamic scripts to synthesise an order confirmation.
+The directory also contains Imposter configuration files, as well as dynamic scripts to synthesise an order confirmation.
 
 ### pet-name-service
 
@@ -31,7 +31,7 @@ A bare directory under `third-party/pet-name-service` containing only an OpenAPI
 
 Defined using OpenAPI specifications under the `third-party/stock-service` directory.
 
-Also contains Imposter configuration files, but no dynamic scripts.
+The directory also contains Imposter configuration files, but no dynamic scripts.
 
 ### user-service
 

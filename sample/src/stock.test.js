@@ -1,18 +1,25 @@
 import stock from "./stock";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
-
-// Important: In your own project, change this to:
-// import {mocks} from "@imposter-js/imposter";
-// or:
-// const {mocks} = require("@imposter-js/imposter");
 import {mocks} from "imposter/src";
+
+/**
+ * Tests for stock-service mock
+ *
+ * Defined using OpenAPI specifications under the `third-party/stock-service` directory.
+ * The directory also contains Imposter configuration files, but no dynamic scripts.
+ *
+ * Important: In your own project, change the import to:
+ *   import {mocks} from "@imposter-js/imposter";
+ * or:
+ *   const {mocks} = require("@imposter-js/imposter");
+ */
 
 jest.setTimeout(30000);
 
 let stockService;
 
 beforeAll(async () => {
-    const configDir = `${process.cwd()}/third-party/stock-service`;
+    const configDir = `${__dirname}/../apis/stock-service`;
     const mock = mocks.start(configDir, 8080);
 
     // set the base URL

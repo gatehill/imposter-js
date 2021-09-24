@@ -1,11 +1,18 @@
 import users from "./users";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
-
-// Important: In your own project, change this to:
-// import {mocks} from "@imposter-js/imposter";
-// or:
-// const {mocks} = require("@imposter-js/imposter");
 import {mocks} from "imposter/src";
+
+/**
+ * Tests for user-service mock
+ *
+ * A mock defined entirely within the test - no OpenAPI specification,
+ * no Imposter configuration - all done when Jest executes the test.
+ *
+ * Important: In your own project, change the import to:
+ *   import {mocks} from "@imposter-js/imposter";
+ * or:
+ *   const {mocks} = require("@imposter-js/imposter");
+ */
 
 jest.setTimeout(30000);
 

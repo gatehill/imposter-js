@@ -7,7 +7,7 @@ import path from "path";
 jest.mock('../mock-manager');
 
 it('builds an openapi mock using builder', async () => {
-    const specFile = `${process.cwd()}/test_data/bare_openapi/pet-name-service.yaml`;
+    const specFile = `${__dirname}/testdata/bare_openapi/pet-name-service.yaml`;
 
     // automocked
     const mockManager = new MockManager();

@@ -64,3 +64,8 @@ it('builds a mock from config object', async () => {
     expect(response.status).toEqual(201);
     expect(response.data).toEqual('Hello world');
 });
+
+it('returns deprecated manager', async () => {
+    const legacyManager = require('../index').default();
+    expect(legacyManager).toBeTruthy();
+});

@@ -17,7 +17,7 @@ it('can discover local config file', () => {
     expect(localConfig).toContain('/testdata/imposter.config.json');
 
     // check file exists
-    expect(fs.existsSync(localConfig)).toBeTruthy();
+    expect(fs.existsSync(localConfig)).toBe(true);
 });
 
 it('returns null if no local config found', () => {

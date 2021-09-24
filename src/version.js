@@ -1,10 +1,15 @@
-import {exec} from "child_process";
+import {spawn} from "child_process";
 
 class VersionReader {
     /**
      * @private {string}
      */
     _versionOutput;
+
+    /**
+     * @private {{major: number, minor: number, revision: number}}
+     */
+    _cliVersion;
 
     async checkInit() {
         if (!this._versionOutput) {
@@ -15,12 +20,27 @@ class VersionReader {
     invokeVersionCommand() {
         return new Promise((resolve, reject) => {
             try {
-                exec('imposter version', (error, stdout, stderr) => {
-                    const output = `${stdout}\n${stderr}`;
-                    if (error) {
-                        reject(new Error(`Error determining version: ${error}\n${output}`));
+                const proc = spawn('imposter', ['version']);
+                let output = '';
+
+                proc.on('error', err => {
+                    reject(new Error(`Error determining version from 'imposter' command. Is Imposter CLI installed?\n${err}`));
+                }).on('exit', (code) => {
+                    if (code === 0) {
+                        resolve(output);
+                    } else {
+                        reject(new Error(`Error determining version. Imposter process terminated with code: ${code}`));
                     }
-                    resolve(output);
+                });
+                proc.stdout.on('data', chunk => {
+                    if (chunk) {
+                        output += chunk.toString();
+                    }
+                });
+                proc.stderr.on('data', chunk => {
+                    if (chunk) {
+                        output += chunk.toString();
+                    }
                 });
             } catch (e) {
                 reject(new Error(`Error spawning Imposter process: ${e}`));
@@ -31,8 +51,8 @@ class VersionReader {
     /**
      * Determines the version of the CLI subcomponent.
      *
-     * @param componentName {string}
-     * @returns {{major: string, minor: string, revision: string}}
+     * @param componentName {RegExp}
+     * @returns {{major: number, minor: number, revision: number}}
      */
     determineVersion(componentName) {
         if (!this._versionOutput) {
@@ -67,10 +87,13 @@ class VersionReader {
     /**
      * Determine the version of the CLI.
      *
-     * @returns {{major: string, minor: string, revision: string}}
+     * @returns {{major: number, minor: number, revision: number}}
      */
     determineCliVersion() {
-        return this.determineVersion(/imposter-cli/);
+        if (!this._cliVersion) {
+            this._cliVersion = this.determineVersion(/imposter-cli/);
+        }
+        return this._cliVersion;
     }
 
     /**

@@ -1,5 +1,4 @@
 import {spawn} from "child_process";
-import {nodeConsole} from "./console";
 
 class VersionReader {
     /**
@@ -7,7 +6,7 @@ class VersionReader {
      * @private
      */
     _initialised = false;
-    
+
     /**
      * @private {string}
      */
@@ -18,15 +17,10 @@ class VersionReader {
      */
     _cliVersion;
 
-    constructor() {
-        nodeConsole.trace('New VersionReader');
-    }
-
     initIfRequired = async () => {
         if (!this._initialised) {
             this._versionOutput = await this.invokeVersionCommand();
             this._initialised = true;
-            nodeConsole.trace('VersionReader initialised');
         }
     }
 
@@ -38,9 +32,8 @@ class VersionReader {
 
                 proc.on('error', err => {
                     reject(new Error(`Error determining version from 'imposter' command. Is Imposter CLI installed?\n${err}`));
-                }).on('exit', (code) => {
+                }).on('close', (code) => {
                     if (code === 0) {
-                        nodeConsole.debug(`Version output: ${output}`);
                         resolve(output);
                     } else {
                         reject(new Error(`Error determining version. Imposter process terminated with code: ${code}`));
@@ -72,7 +65,6 @@ class VersionReader {
         if (!this._initialised) {
             throw new Error('initIfRequired() not called');
         }
-        nodeConsole.debug(`Determining version for component: ${componentName} from output: '${this._versionOutput}'`);
         try {
             /*
              * Parse CLI output in the form:
@@ -83,24 +75,15 @@ class VersionReader {
              * ...filtering by componentName, into an array of Strings containing the SemVer components:
              * [ "0", "1", "0" ]
              */
-            const componentVersion = this._versionOutput.split('\n')
-                .filter(line => line.match(componentName));
-            nodeConsole.debug(`component version: ${componentVersion}`);
+            const version = this._versionOutput.split('\n')
+                .filter(line => line.match(componentName))
+                .map(cliVersion => cliVersion.split(' ')[1].trim().split('.'))[0];
 
-            const versions = componentVersion.map(cliVersion =>
-                cliVersion.split(' ')[1].trim().split('.'));
-            nodeConsole.debug(`versions: ${versions}`);
-
-            const version = versions[0];
-            nodeConsole.debug(`version: ${version}`);
-
-            const v = {
+            return {
                 major: Number(version[0]),
                 minor: Number(version[1]),
                 revision: Number(version[2]),
             };
-            nodeConsole.debug(`v: ${v}`);
-            return v;
 
         } catch (e) {
             throw new Error(`Error parsing version '${this._versionOutput}': ${e}`);

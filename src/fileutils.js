@@ -1,7 +1,6 @@
 import path, {dirname} from "path";
 import fs, {constants} from "fs";
 import {versionReader} from "./version";
-import {nodeConsole} from "./console";
 
 class FileUtils {
     /**
@@ -14,10 +13,6 @@ class FileUtils {
      * @private
      */
     _pkgJsonDir;
-
-    constructor() {
-        nodeConsole.trace('New FileUtils');
-    }
 
     initIfRequired = async () => {
         await versionReader.initIfRequired();
@@ -33,7 +28,6 @@ class FileUtils {
                 }
             }
             this._initialised = true;
-            nodeConsole.trace('FileUtils initialised');
         }
     }
 

@@ -1,5 +1,5 @@
 import {beforeAll, expect, it} from '@jest/globals';
-import {buildDebugAdvice, writeChunk} from "../configured-mock";
+import {writeChunk, ConfiguredMock} from "../configured-mock";
 import {versionReader} from "../version";
 
 /**
@@ -17,7 +17,8 @@ See log file: /tmp/example
 Consider setting .verbose() on your mock for more details.
 Run 'imposter doctor' to diagnose engine issues.`
 
-    expect(buildDebugAdvice(true, false, '/tmp/example')).toEqual(expected);
+    const configuredMock = new ConfiguredMock('dir', 8080);
+    expect(configuredMock.buildDebugAdvice(true, false, '/tmp/example')).toEqual(expected);
 });
 
 it('writes chunk to console', async () => {

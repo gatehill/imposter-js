@@ -66,10 +66,12 @@ export class ConfiguredMock {
     listenForEvents = async (proc, reject) => {
         proc.on('error', err => {
             reject(new Error(`Error running 'imposter' command. Is Imposter CLI installed?\n${err}`));
-        }).on('exit', (code) => {
+        }).on('close', (code) => {
             if (code !== 0) {
-                const advice = buildDebugAdvice(this.logToFile, this.logVerbose, this.logFilePath);
+                const advice = this.buildDebugAdvice(this.logToFile, this.logVerbose, this.logFilePath);
                 reject(new Error(`Imposter process terminated with code: ${code}.${advice}`));
+            } else {
+                nodeConsole.debug('Imposter process terminated');
             }
         });
         if (this.logToFile) {
@@ -90,7 +92,7 @@ export class ConfiguredMock {
         let ready = false;
         while (!ready) {
             if (proc.exitCode) {
-                const advice = buildDebugAdvice(this.logToFile, this.logVerbose, this.logFilePath);
+                const advice = this.buildDebugAdvice(this.logToFile, this.logVerbose, this.logFilePath);
                 throw new Error(`Failed to start mock engine on port ${this.port}. Exit code: ${proc.exitCode}${advice}`);
             }
             try {
@@ -136,20 +138,20 @@ export class ConfiguredMock {
     baseUrl = () => {
         return `http://localhost:${this.port}`;
     }
-}
 
-export function buildDebugAdvice(logToFile, logVerbose, logFilePath) {
-    let advice = '';
-    if (logToFile) {
-        advice += `\nSee log file: ${logFilePath}`;
+    buildDebugAdvice = (logToFile, logVerbose, logFilePath) => {
+        let advice = '';
+        if (logToFile) {
+            advice += `\nSee log file: ${logFilePath}`;
+        }
+        if (!logVerbose) {
+            advice += '\nConsider setting .verbose() on your mock for more details.';
+        }
+        versionReader.runIfVersionAtLeast(0, 6, 2, () => {
+            advice += `\nRun 'imposter doctor' to diagnose engine issues.`
+        });
+        return advice;
     }
-    if (!logVerbose) {
-        advice += '\nConsider setting .verbose() on your mock for more details.';
-    }
-    versionReader.runIfVersionAtLeast(0, 6, 2, () => {
-        advice += `\nRun 'imposter doctor' to diagnose engine issues.`
-    });
-    return advice;
 }
 
 export function writeChunk(chunk, logVerbose, logToFile, consoleFn, logFileStream) {

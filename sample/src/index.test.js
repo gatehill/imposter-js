@@ -23,13 +23,15 @@ jest.setTimeout(30000);
 let app;
 
 beforeAll(async () => {
-    // spin up a mock for all third parties
     const mockInstances = [];
+
+    // spin up a mock for each API
     for (const t in apisToMock) {
-        const service = apisToMock[t];
-        const configDir = `${__dirname}/../apis/${service.dir}`;
+        const api = apisToMock[t];
+        const configDir = `${__dirname}/../apis/${api.dir}`;
+
         mockInstances.push(
-            mocks.start(configDir, service.port)
+            mocks.start(configDir, api.port)
         );
     }
 

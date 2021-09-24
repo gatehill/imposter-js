@@ -1,8 +1,8 @@
 import {beforeAll, expect, it} from '@jest/globals';
 import {versionReader} from "../version";
 
-beforeAll(async () => {
-    await versionReader.checkInit();
+beforeAll(() => {
+    return versionReader.initIfRequired();
 });
 
 it('can determine the CLI version', () => {

@@ -4,13 +4,15 @@ import {MockManager} from "../mock-manager";
 import fs from "fs";
 import path from "path";
 
-jest.mock('../mock-manager');
-
 it('builds an openapi mock using builder', async () => {
     const specFile = `${__dirname}/testdata/bare_openapi/pet-name-service.yaml`;
 
-    // automocked
-    const mockManager = new MockManager();
+    let prepared = false;
+    const mockManager = {
+        prepare: () => {
+            prepared = true;
+        }
+    }
 
     const builder = new MockBuilder(mockManager)
         .withPort(8081)
@@ -25,7 +27,7 @@ it('builds an openapi mock using builder', async () => {
 
     // build should invoke prepare on the manager
     builder.build();
-    expect(mockManager.prepare).toHaveBeenCalled();
+    expect(prepared).toEqual(true);
 
     // config file should be written
     const configFilePath = path.join(builder.configDir, 'imposter-config.json');
@@ -55,8 +57,12 @@ it('builds an ephemeral mock using builder', async () => {
         ]
     };
 
-    // automocked
-    const mockManager = new MockManager();
+    let prepared = false;
+    const mockManager = {
+        prepare: () => {
+            prepared = true;
+        }
+    }
 
     const builder = new MockBuilder(mockManager)
         .withPort(8082)
@@ -64,7 +70,7 @@ it('builds an ephemeral mock using builder', async () => {
 
     // build should invoke prepare on the manager
     builder.build();
-    expect(mockManager.prepare).toHaveBeenCalled();
+    expect(prepared).toEqual(true);
 
     // config file should be written
     const configFilePath = path.join(builder.configDir, 'imposter-config.json');

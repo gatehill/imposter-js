@@ -1,6 +1,13 @@
 import {spawn} from "child_process";
+import {nodeConsole} from "./console";
 
 class VersionReader {
+    /**
+     * @type {boolean}
+     * @private
+     */
+    _initialised = false;
+    
     /**
      * @private {string}
      */
@@ -11,13 +18,19 @@ class VersionReader {
      */
     _cliVersion;
 
-    async checkInit() {
-        if (!this._versionOutput) {
+    constructor() {
+        nodeConsole.trace('New VersionReader');
+    }
+
+    initIfRequired = async () => {
+        if (!this._initialised) {
             this._versionOutput = await this.invokeVersionCommand();
+            this._initialised = true;
+            nodeConsole.trace('VersionReader initialised');
         }
     }
 
-    invokeVersionCommand() {
+    invokeVersionCommand = () => {
         return new Promise((resolve, reject) => {
             try {
                 const proc = spawn('imposter', ['version']);
@@ -27,6 +40,7 @@ class VersionReader {
                     reject(new Error(`Error determining version from 'imposter' command. Is Imposter CLI installed?\n${err}`));
                 }).on('exit', (code) => {
                     if (code === 0) {
+                        nodeConsole.debug(`Version output: ${output}`);
                         resolve(output);
                     } else {
                         reject(new Error(`Error determining version. Imposter process terminated with code: ${code}`));
@@ -54,11 +68,11 @@ class VersionReader {
      * @param componentName {RegExp}
      * @returns {{major: number, minor: number, revision: number}}
      */
-    determineVersion(componentName) {
-        if (!this._versionOutput) {
-            throw new Error('checkInit() not called');
+    determineVersion = (componentName) => {
+        if (!this._initialised) {
+            throw new Error('initIfRequired() not called');
         }
-
+        nodeConsole.debug(`Determining version for component: ${componentName} from output: '${this._versionOutput}'`);
         try {
             /*
              * Parse CLI output in the form:
@@ -69,18 +83,27 @@ class VersionReader {
              * ...filtering by componentName, into an array of Strings containing the SemVer components:
              * [ "0", "1", "0" ]
              */
-            const version = this._versionOutput.split('\n')
-                .filter(line => line.match(componentName))
-                .map(cliVersion => cliVersion.split(' ')[1].trim().split('.'))[0];
+            const componentVersion = this._versionOutput.split('\n')
+                .filter(line => line.match(componentName));
+            nodeConsole.debug(`component version: ${componentVersion}`);
 
-            return {
+            const versions = componentVersion.map(cliVersion =>
+                cliVersion.split(' ')[1].trim().split('.'));
+            nodeConsole.debug(`versions: ${versions}`);
+
+            const version = versions[0];
+            nodeConsole.debug(`version: ${version}`);
+
+            const v = {
                 major: Number(version[0]),
                 minor: Number(version[1]),
                 revision: Number(version[2]),
             };
+            nodeConsole.debug(`v: ${v}`);
+            return v;
 
         } catch (e) {
-            throw new Error(`Error parsing version: ${e}`);
+            throw new Error(`Error parsing version '${this._versionOutput}': ${e}`);
         }
     }
 
@@ -89,7 +112,7 @@ class VersionReader {
      *
      * @returns {{major: number, minor: number, revision: number}}
      */
-    determineCliVersion() {
+    determineCliVersion = () => {
         if (!this._cliVersion) {
             this._cliVersion = this.determineVersion(/imposter-cli/);
         }
@@ -106,7 +129,7 @@ class VersionReader {
      * @param orElseBlock {function}
      * @returns {*|undefined}
      */
-    runIfVersionAtLeast(major, minor, revision, block, orElseBlock = undefined) {
+    runIfVersionAtLeast = (major, minor, revision, block, orElseBlock = undefined) => {
         const cliVersion = this.determineCliVersion();
         if (cliVersion.major >= major && cliVersion.minor >= minor && cliVersion.revision >= revision) {
             return block();

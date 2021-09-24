@@ -3,8 +3,8 @@ import {fileUtils} from "../fileutils";
 import path from "path";
 import fs from "fs";
 
-beforeAll(async () => {
-    await fileUtils.checkInit();
+beforeAll(() => {
+    return fileUtils.initIfRequired();
 });
 
 it('can discover local config file', () => {

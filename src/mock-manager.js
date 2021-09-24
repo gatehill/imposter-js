@@ -19,7 +19,7 @@ export class MockManager {
      * @param port {number}
      * @return {ConfiguredMock}
      */
-    prepare(configDir, port) {
+    prepare = (configDir, port) => {
         port = port ? port : 8080;
         const mock = new ConfiguredMock(configDir, port);
         if (this._logVerbose) {
@@ -43,25 +43,25 @@ export class MockManager {
      * @param port {number}
      * @return {Promise<ConfiguredMock>}
      */
-    start(configDir, port) {
+    start = (configDir, port) => {
         return this.prepare(configDir, port).start();
     }
 
-    stopAll() {
+    stopAll = () => {
         this._mocks.forEach(mock => mock.stop());
     }
 
     /**
      * @return {MockBuilder}
      */
-    builder() {
+    builder = () => {
         return new MockBuilder(this);
     }
 
     /**
      * @return {MockManager}
      */
-    verbose() {
+    verbose = () => {
         this._logVerbose = true;
         return this;
     }

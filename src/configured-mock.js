@@ -24,12 +24,12 @@ export class ConfiguredMock {
     /**
      * @return {Promise<ConfiguredMock>}
      */
-    async start() {
+    start = async () => {
         if (this.proc) {
             throw new Error(`Mock on port ${this.port} already started`);
         }
         try {
-            await fileUtils.checkInit();
+            await fileUtils.initIfRequired();
         } catch (e) {
             throw new Error(`Error during initialisation: ${e}`);
         }
@@ -63,7 +63,7 @@ export class ConfiguredMock {
         return this;
     }
 
-    async listenForEvents(proc, reject) {
+    listenForEvents = async (proc, reject) => {
         proc.on('error', err => {
             reject(new Error(`Error running 'imposter' command. Is Imposter CLI installed?\n${err}`));
         }).on('exit', (code) => {
@@ -85,7 +85,7 @@ export class ConfiguredMock {
         });
     }
 
-    async waitUntilReady(proc) {
+    waitUntilReady = async (proc) => {
         nodeConsole.debug(`Waiting for mock server to come up on port ${this.port}`);
         let ready = false;
         while (!ready) {
@@ -105,7 +105,7 @@ export class ConfiguredMock {
         nodeConsole.debug('Mock server is up!');
     }
 
-    stop() {
+    stop = () => {
         if (!this.proc || !this.proc.pid) {
             nodeConsole.debug(`Mock server on port ${this.port} was not running`);
         } else {
@@ -125,7 +125,7 @@ export class ConfiguredMock {
     /**
      * @return {ConfiguredMock}
      */
-    verbose() {
+    verbose = () => {
         this.logVerbose = true;
         return this;
     }
@@ -133,7 +133,7 @@ export class ConfiguredMock {
     /**
      * @return {string}
      */
-    baseUrl() {
+    baseUrl = () => {
         return `http://localhost:${this.port}`;
     }
 }

@@ -20,7 +20,7 @@ export class MockBuilder {
      * @param port {number}
      * @return {MockBuilder}
      */
-    withPort(port) {
+    withPort = (port) => {
         this.port = port;
         return this;
     }
@@ -29,7 +29,7 @@ export class MockBuilder {
      * @param plugin {string}
      * @return {MockBuilder}
      */
-    withPlugin(plugin) {
+    withPlugin = (plugin) => {
         if (this.config.plugin && this.config.plugin !== plugin) {
             throw new Error(`Plugin already set to: ${this.config.plugin}`);
         }
@@ -41,7 +41,7 @@ export class MockBuilder {
      * @param specFilePath {string}
      * @return {MockBuilder}
      */
-    withOpenApiSpec(specFilePath) {
+    withOpenApiSpec = (specFilePath) => {
         this.withPlugin('openapi');
         const specFileName = path.basename(specFilePath);
         fs.copyFileSync(specFilePath, path.join(this.configDir, specFileName));
@@ -54,7 +54,7 @@ export class MockBuilder {
      *
      * @return {MockBuilder}
      */
-    withRequestValidation() {
+    withRequestValidation = () => {
         this.withPlugin('openapi');
         this.config.validation = {
             request: true,
@@ -71,7 +71,7 @@ export class MockBuilder {
      * @param config
      * @return {MockBuilder}
      */
-    withConfig(config) {
+    withConfig = (config) => {
         this.config = config;
         return this;
     }
@@ -79,7 +79,7 @@ export class MockBuilder {
     /**
      * @return {ConfiguredMock}
      */
-    build() {
+    build = () => {
         const mockConfigPath = path.join(this.configDir, 'imposter-config.json');
         fs.writeFileSync(mockConfigPath, JSON.stringify(this.config, null, '  '));
         nodeConsole.debug(`Wrote mock config to: ${mockConfigPath}`);

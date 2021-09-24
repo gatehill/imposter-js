@@ -1,23 +1,39 @@
 import path, {dirname} from "path";
 import fs, {constants} from "fs";
 import {versionReader} from "./version";
+import {nodeConsole} from "./console";
 
 class FileUtils {
-    pkgJsonDir;
+    /**
+     * @type {boolean}
+     * @private
+     */
+    _initialised = false;
 
-    async checkInit() {
-        await versionReader.checkInit();
+    /**
+     * @private
+     */
+    _pkgJsonDir;
 
-        if (!this.pkgJsonDir) {
+    constructor() {
+        nodeConsole.trace('New FileUtils');
+    }
+
+    initIfRequired = async () => {
+        await versionReader.initIfRequired();
+
+        if (!this._initialised) {
             for (let path of module.paths) {
                 try {
                     let prospectivePkgJsonDir = dirname(path);
                     await fs.promises.access(path, constants.F_OK);
-                    this.pkgJsonDir = prospectivePkgJsonDir;
+                    this._pkgJsonDir = prospectivePkgJsonDir;
                     break
                 } catch (ignored) {
                 }
             }
+            this._initialised = true;
+            nodeConsole.trace('FileUtils initialised');
         }
     }
 
@@ -28,7 +44,7 @@ class FileUtils {
      * @param searchPaths {string[]}
      * @returns {string|undefined|null}
      */
-    discoverLocalConfig(searchPaths = null) {
+    discoverLocalConfig = (searchPaths = null) => {
         return versionReader.runIfVersionAtLeast(0, 6, 0, () => {
             const sp = searchPaths || [
                 this.getPkgJsonDir(),
@@ -47,11 +63,11 @@ class FileUtils {
      *
      * @returns {string}
      */
-    getPkgJsonDir() {
-        if (!this.pkgJsonDir) {
-            throw new Error('checkInit() not called');
+    getPkgJsonDir = () => {
+        if (!this._initialised) {
+            throw new Error('initIfRequired() not called');
         }
-        return this.pkgJsonDir;
+        return this._pkgJsonDir;
     }
 }
 

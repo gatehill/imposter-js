@@ -7,8 +7,8 @@ import {versionReader} from "../version";
  * the `MockBuilder` tests and integrated tests.
  */
 
-beforeAll(async () => {
-    await versionReader.checkInit();
+beforeAll(() => {
+    return versionReader.initIfRequired();
 });
 
 it('generates debug advice', async () => {

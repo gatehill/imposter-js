@@ -6,7 +6,7 @@ import {mocks} from "imposter/src";
  * Tests for user-service mock
  *
  * A mock defined entirely within the test - no OpenAPI specification,
- * no Imposter configuration - all done when Jest executes the test.
+ * no Imposter configuration - all configured within the Jest test.
  *
  * Important: In your own project, change the import to:
  *   import {mocks} from "@imposter-js/imposter";

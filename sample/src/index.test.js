@@ -5,7 +5,7 @@ import {mocks} from "imposter/src";
 /**
  * Tests for the application
  *
- * A simple application is that chains calls for some of the services.
+ * A simple application that chains calls for some of the services.
  *
  * Important: In your own project, change the import to:
  *   import {mocks} from "@imposter-js/imposter";

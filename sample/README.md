@@ -19,23 +19,23 @@ The following APIs are mocked:
 
 ### order-service
 
-Defined using OpenAPI specifications under the `third-party/order-service` directory.
+Defined using OpenAPI specifications under the `apis/order-service` directory.
 
 The directory also contains Imposter configuration files, as well as dynamic scripts to synthesise an order confirmation.
 
 ### pet-name-service
 
-A bare directory under `third-party/pet-name-service` containing only an OpenAPI file, with the Imposter configuration generated when the mock starts.
+A bare directory under `apis/pet-name-service` containing only an OpenAPI file, with the Imposter configuration generated when the mock starts.
 
 ### stock-service
 
-Defined using OpenAPI specifications under the `third-party/stock-service` directory.
+Defined using OpenAPI specifications under the `apis/stock-service` directory.
 
 The directory also contains Imposter configuration files, but no dynamic scripts.
 
 ### user-service
 
-A mock defined entirely within the [Jest test](./src/users.test.js) - no OpenAPI specification, no Imposter configuration - all done when Jest executes the test.
+A mock defined entirely within the [Jest test](./src/users.test.js) - no OpenAPI specification, no Imposter configuration - all configured within the Jest test.
 
 ## Application details
 

@@ -5,7 +5,7 @@ import {mocks} from "imposter/src";
 /**
  * Tests for order-service mock.
  *
- * Defined using OpenAPI specifications under the `third-party/order-service` directory.
+ * Defined using OpenAPI specifications under the `apis/order-service` directory.
  * The directory also contains Imposter configuration files, as well as dynamic scripts to synthesise
  * an order confirmation.
  *

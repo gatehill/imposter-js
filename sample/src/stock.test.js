@@ -5,7 +5,7 @@ import {mocks} from "imposter/src";
 /**
  * Tests for stock-service mock
  *
- * Defined using OpenAPI specifications under the `third-party/stock-service` directory.
+ * Defined using OpenAPI specifications under the `apis/stock-service` directory.
  * The directory also contains Imposter configuration files, but no dynamic scripts.
  *
  * Important: In your own project, change the import to:

@@ -5,7 +5,7 @@ import {mocks} from "imposter/src";
 /**
  * Tests for pet-name-service mock
  *
- * A bare directory under `third-party/pet-name-service` containing only an OpenAPI file,
+ * A bare directory under `apis/pet-name-service` containing only an OpenAPI file,
  * with the Imposter configuration generated when the mock starts.
  *
  * Important: In your own project, change the import to:

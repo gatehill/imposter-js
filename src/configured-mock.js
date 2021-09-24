@@ -8,17 +8,35 @@ import os from "os";
 import {httpGet} from "./healthcheck";
 
 export class ConfiguredMock {
+    /**
+     * @type {string}
+     */
     configDir;
+
+    /**
+     * @type {number}
+     */
     port;
+
     logVerbose = false;
     logToFile = true;
-    logFilePath;
     logFileStream;
     proc;
+
+    /**
+     * @type {string}
+     */
+    logFilePath;
+
+    /**
+     * @type {Utils}
+     */
+    utils;
 
     constructor(configDir, port) {
         this.configDir = configDir;
         this.port = port;
+        this.utils = new Utils();
     }
 
     /**
@@ -66,12 +84,15 @@ export class ConfiguredMock {
     listenForEvents = async (proc, reject) => {
         proc.on('error', err => {
             reject(new Error(`Error running 'imposter' command. Is Imposter CLI installed?\n${err}`));
+
         }).on('close', (code) => {
             if (code !== 0) {
-                const advice = this.buildDebugAdvice(this.logToFile, this.logVerbose, this.logFilePath);
+                const advice = this.utils.buildDebugAdvice(this.logToFile, this.logVerbose, this.logFilePath);
                 reject(new Error(`Imposter process terminated with code: ${code}.${advice}`));
             } else {
-                nodeConsole.debug('Imposter process terminated');
+                if (this.logVerbose) {
+                    nodeConsole.debug('Imposter process terminated');
+                }
             }
         });
         if (this.logToFile) {
@@ -80,10 +101,10 @@ export class ConfiguredMock {
             nodeConsole.debug(`Logging to ${this.logFilePath}`);
         }
         proc.stdout.on('data', chunk => {
-            writeChunk(chunk, this.logVerbose, this.logToFile, nodeConsole.debug, this.logFileStream);
+            this.utils.writeChunk(chunk, this.logVerbose, this.logToFile, nodeConsole.debug, this.logFileStream);
         });
         proc.stderr.on('data', chunk => {
-            writeChunk(chunk, this.logVerbose, this.logToFile, nodeConsole.warn, this.logFileStream);
+            this.utils.writeChunk(chunk, this.logVerbose, this.logToFile, nodeConsole.warn, this.logFileStream);
         });
     }
 
@@ -92,7 +113,7 @@ export class ConfiguredMock {
         let ready = false;
         while (!ready) {
             if (proc.exitCode) {
-                const advice = this.buildDebugAdvice(this.logToFile, this.logVerbose, this.logFilePath);
+                const advice = this.utils.buildDebugAdvice(this.logToFile, this.logVerbose, this.logFilePath);
                 throw new Error(`Failed to start mock engine on port ${this.port}. Exit code: ${proc.exitCode}${advice}`);
             }
             try {
@@ -101,7 +122,7 @@ export class ConfiguredMock {
                     ready = true;
                 }
             } catch (ignored) {
-                await sleep(200);
+                await this.utils.sleep(200);
             }
         }
         nodeConsole.debug('Mock server is up!');
@@ -118,7 +139,6 @@ export class ConfiguredMock {
                 nodeConsole.warn(`Error stopping mock server with pid ${this.proc.pid}`, e);
             }
         }
-
         if (this.logFileStream) {
             this.logFileStream.close();
         }
@@ -138,7 +158,9 @@ export class ConfiguredMock {
     baseUrl = () => {
         return `http://localhost:${this.port}`;
     }
+}
 
+export class Utils {
     buildDebugAdvice = (logToFile, logVerbose, logFilePath) => {
         let advice = '';
         if (logToFile) {
@@ -152,25 +174,25 @@ export class ConfiguredMock {
         });
         return advice;
     }
-}
 
-export function writeChunk(chunk, logVerbose, logToFile, consoleFn, logFileStream) {
-    if (!chunk) {
-        return;
-    }
-    if (logVerbose) {
-        consoleFn(chunk.toString().trim());
-    }
-    if (logToFile) {
-        try {
-            logFileStream.write(chunk);
-        } catch (ignored) {
+    writeChunk = (chunk, logVerbose, logToFile, consoleFn, logFileStream) => {
+        if (!chunk) {
+            return;
+        }
+        if (logVerbose) {
+            consoleFn(chunk.toString().trim());
+        }
+        if (logToFile) {
+            try {
+                logFileStream.write(chunk);
+            } catch (ignored) {
+            }
         }
     }
-}
 
-function sleep(ms) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
+    sleep = (ms) => {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
+    }
 }

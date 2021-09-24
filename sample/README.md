@@ -15,7 +15,7 @@ Run tests as follows:
 
 ## API details
 
-The following third party services are mocked:
+The following APIs are mocked:
 
 ### order-service
 

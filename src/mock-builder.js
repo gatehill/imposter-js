@@ -4,8 +4,16 @@ import os from "os";
 import {nodeConsole} from "./console";
 
 export class MockBuilder {
+    /**
+     * @type {MockManager}
+     */
     mockManager;
+
     config = {};
+
+    /**
+     * @type {string}
+     */
     configDir;
 
     /**

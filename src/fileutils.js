@@ -10,6 +10,7 @@ class FileUtils {
     _initialised = false;
 
     /**
+     * @type {string}
      * @private
      */
     _pkgJsonDir;

@@ -1,11 +1,13 @@
 import {beforeAll, expect, it} from '@jest/globals';
-import {writeChunk, ConfiguredMock} from "../configured-mock";
+import {Utils} from "../configured-mock";
 import {versionReader} from "../version";
 
 /**
  * The majority of coverage for `ConfiguredMock` comes via
  * the `MockBuilder` tests and integrated tests.
  */
+
+const utils = new Utils();
 
 beforeAll(() => {
     return versionReader.initIfRequired();
@@ -17,8 +19,7 @@ See log file: /tmp/example
 Consider setting .verbose() on your mock for more details.
 Run 'imposter doctor' to diagnose engine issues.`
 
-    const configuredMock = new ConfiguredMock('dir', 8080);
-    expect(configuredMock.buildDebugAdvice(true, false, '/tmp/example')).toEqual(expected);
+    expect(utils.buildDebugAdvice(true, false, '/tmp/example')).toEqual(expected);
 });
 
 it('writes chunk to console', async () => {
@@ -27,7 +28,7 @@ it('writes chunk to console', async () => {
         consoleOutput += chunk;
     };
 
-    writeChunk('foo', true, false, fakeConsole, null);
+    utils.writeChunk('foo', true, false, fakeConsole, null);
 
     expect(consoleOutput).toEqual('foo');
 });
@@ -40,7 +41,7 @@ it('writes chunk to stream', async () => {
         }
     };
 
-    writeChunk('foo', false, true, null, fakeStream);
+    utils.writeChunk('foo', false, true, null, fakeStream);
 
     expect(consoleOutput).toEqual('foo');
 });

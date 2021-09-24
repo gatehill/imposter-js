@@ -1,18 +1,14 @@
-import {expect, it, jest} from '@jest/globals';
+import {expect, it} from '@jest/globals';
 import {MockBuilder} from "../mock-builder";
-import {MockManager} from "../mock-manager";
+import MockManager from "./__mocks__/mock-manager";
 import fs from "fs";
 import path from "path";
 
 it('builds an openapi mock using builder', async () => {
     const specFile = `${__dirname}/testdata/bare_openapi/pet-name-service.yaml`;
 
-    let prepared = false;
-    const mockManager = {
-        prepare: () => {
-            prepared = true;
-        }
-    }
+    // manual mock
+    const mockManager = new MockManager();
 
     const builder = new MockBuilder(mockManager)
         .withPort(8081)
@@ -27,17 +23,9 @@ it('builds an openapi mock using builder', async () => {
 
     // build should invoke prepare on the manager
     builder.build();
-    expect(prepared).toEqual(true);
+    expect(mockManager.prepare).toHaveBeenCalled();
 
-    // config file should be written
-    const configFilePath = path.join(builder.configDir, 'imposter-config.json');
-    expect(fs.existsSync(configFilePath)).toBe(true);
-
-    // validate config
-    const configData = await fs.promises.readFile(configFilePath);
-    expect(configData.length).toBeGreaterThan(0);
-
-    const configObj = JSON.parse(configData);
+    const configObj = await readConfigFile(builder);
     expect(configObj.plugin).toEqual('openapi');
     expect(configObj.specFile).toEqual('pet-name-service.yaml');
 });
@@ -57,12 +45,8 @@ it('builds an ephemeral mock using builder', async () => {
         ]
     };
 
-    let prepared = false;
-    const mockManager = {
-        prepare: () => {
-            prepared = true;
-        }
-    }
+    // manual mock
+    const mockManager = new MockManager();
 
     const builder = new MockBuilder(mockManager)
         .withPort(8082)
@@ -70,8 +54,14 @@ it('builds an ephemeral mock using builder', async () => {
 
     // build should invoke prepare on the manager
     builder.build();
-    expect(prepared).toEqual(true);
+    expect(mockManager.prepare).toHaveBeenCalled();
 
+    const configObj = await readConfigFile(builder);
+    expect(configObj.plugin).toEqual('rest');
+    expect(configObj.resources).toHaveLength(1);
+});
+
+const readConfigFile = async function (builder) {
     // config file should be written
     const configFilePath = path.join(builder.configDir, 'imposter-config.json');
     expect(fs.existsSync(configFilePath)).toBe(true);
@@ -80,7 +70,5 @@ it('builds an ephemeral mock using builder', async () => {
     const configData = await fs.promises.readFile(configFilePath);
     expect(configData.length).toBeGreaterThan(0);
 
-    const configObj = JSON.parse(configData);
-    expect(configObj.plugin).toEqual('rest');
-    expect(configObj.resources).toHaveLength(1);
-});
+    return JSON.parse(configData.toString());
+};

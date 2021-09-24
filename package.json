@@ -11,7 +11,7 @@
   "scripts": {
     "clean": "rimraf ./dist",
     "test": "jest",
-    "build": "npm run clean && mkdir -p ./dist && babel ./src --ignore '**/*.test.js' --out-dir ./dist --source-maps",
+    "build": "npm run clean && mkdir -p ./dist && babel ./src --ignore '**/*.test.js' --ignore '**/__mocks__/*' --out-dir ./dist --source-maps",
     "release": "npm test && npm run build && npm publish --access public"
   },
   "files": [

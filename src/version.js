@@ -8,12 +8,14 @@ class VersionReader {
     _initialised = false;
 
     /**
-     * @private {string}
+     * @type {string}
+     * @private
      */
     _versionOutput;
 
     /**
-     * @private {{major: number, minor: number, revision: number}}
+     * @type {{major: number, minor: number, revision: number}}
+     * @private
      */
     _cliVersion;
 

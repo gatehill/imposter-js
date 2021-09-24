@@ -7,17 +7,33 @@ const {promises: {access}} = require('fs');
 class FileUtils {
     pkgJsonDir;
 
+    async checkInit() {
+        await versionReader.checkInit();
+
+        if (!this.pkgJsonDir) {
+            for (let path of module.paths) {
+                try {
+                    let prospectivePkgJsonDir = dirname(path);
+                    await access(path, constants.F_OK);
+                    this.pkgJsonDir = prospectivePkgJsonDir;
+                    break
+                } catch (ignored) {
+                }
+            }
+        }
+    }
+
     /**
      * Searches the current working directory and the module's project directory
      * for a CLI configuration file.
      *
      * @param searchPaths {string[]}
-     * @returns {Promise<string|undefined|null>}
+     * @returns {string|undefined|null}
      */
-    async discoverLocalConfig(searchPaths = null) {
-        return await versionReader.runIfVersionAtLeast(0, 6, async () => {
+    discoverLocalConfig(searchPaths = null) {
+        return versionReader.runIfVersionAtLeast(0, 6, 0, () => {
             const sp = searchPaths || [
-                await this.getPkgJsonDir(),
+                this.getPkgJsonDir(),
                 process.cwd(),
             ];
             const configs = sp
@@ -31,19 +47,11 @@ class FileUtils {
     /**
      * Determine the path to the module's project directory.
      *
-     * @returns {Promise<string>}
+     * @returns {string}
      */
-    async getPkgJsonDir() {
+    getPkgJsonDir() {
         if (!this.pkgJsonDir) {
-            for (let path of module.paths) {
-                try {
-                    let prospectivePkgJsonDir = dirname(path);
-                    await access(path, constants.F_OK);
-                    this.pkgJsonDir = prospectivePkgJsonDir;
-                    break
-                } catch (ignored) {
-                }
-            }
+            throw new Error('checkInit() not called');
         }
         return this.pkgJsonDir;
     }

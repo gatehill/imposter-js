@@ -4,6 +4,7 @@ import os from "os";
 import path from "path";
 import {fileUtils} from "./fileutils";
 import {httpGet} from "./healthcheck";
+import {versionReader} from "./version";
 
 // Don't use the global console - this gets
 // overridden by Jest and makes output chatty.
@@ -114,39 +115,55 @@ class ConfiguredMock {
         if (this.proc) {
             throw new Error(`Mock on port ${this.port} already started`);
         }
-
-        const localConfigFile = await fileUtils.discoverLocalConfig();
-
-        let proc;
         try {
-            const args = [
-                'up', this.configDir,
-                `--port=${this.port}`,
-                '--auto-restart=false',
-            ];
-            if (localConfigFile) {
-                if (this.logVerbose) {
-                    nodeConsole.debug(`Using project configuration: ${localConfigFile}`);
-                }
-                args.push(`--config=${localConfigFile}`);
-            }
-            proc = this.proc = spawn('imposter', args);
+            await fileUtils.checkInit();
         } catch (e) {
-            throw new Error(`Error spawning Imposter process: ${e}`)
+            throw new Error(`Error during initialisation: ${e}`);
         }
 
-        this.configureLogging(proc);
-        await this.waitUntilReady(proc);
+        const localConfigFile = fileUtils.discoverLocalConfig();
+
+        this.proc = await new Promise(async (resolve, reject) => {
+            try {
+                const args = [
+                    'up', this.configDir,
+                    `--port=${this.port}`,
+                    '--auto-restart=false',
+                ];
+                if (localConfigFile) {
+                    if (this.logVerbose) {
+                        nodeConsole.debug(`Using project configuration: ${localConfigFile}`);
+                    }
+                    args.push(`--config=${localConfigFile}`);
+                }
+                const proc = spawn('imposter', args);
+                this.listenForEvents(proc, reject);
+
+                await this.waitUntilReady(proc);
+                resolve(proc);
+
+            } catch (e) {
+                reject(new Error(`Error spawning Imposter process. Is Imposter CLI installed?\n${e}`));
+            }
+        });
+
         return this;
     }
 
-    configureLogging(proc) {
+    listenForEvents(proc, reject) {
+        proc.on('error', err => {
+            reject(new Error(`Error running 'imposter' command. Is Imposter CLI installed?\n${err}`));
+        }).on('exit', (code) => {
+            if (code !== 0) {
+                const advice = buildDebugAdvice(this.logToFile, this.logVerbose, this.logFilePath);
+                reject(new Error(`Imposter process terminated with code: ${code}.${advice}`));
+            }
+        });
         if (this.logToFile) {
             this.logFilePath = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'imposter')), 'imposter.log');
             this.logFileStream = fs.createWriteStream(this.logFilePath);
             nodeConsole.debug(`Logging to ${this.logFilePath}`);
         }
-
         proc.stdout.on('data', chunk => {
             writeChunk(chunk, this.logVerbose, this.logToFile, nodeConsole.debug, this.logFileStream);
         });
@@ -160,8 +177,8 @@ class ConfiguredMock {
         let ready = false;
         while (!ready) {
             if (proc.exitCode) {
-                const verbosePrompt = this.logVerbose ? "" : '\nTry setting .verbose() on your mock for more details.';
-                throw new Error(`Failed to start mock engine on port ${this.port}. Exit code: ${proc.exitCode}\nSee log file: ${this.logFilePath}${verbosePrompt}`);
+                const advice = buildDebugAdvice(this.logToFile, this.logVerbose, this.logFilePath);
+                throw new Error(`Failed to start mock engine on port ${this.port}. Exit code: ${proc.exitCode}${advice}`);
             }
             try {
                 const response = await httpGet(`http://localhost:${this.port}/system/status`);
@@ -258,6 +275,20 @@ class MockManager {
         this.logVerbose = true;
         return this;
     }
+}
+
+function buildDebugAdvice(logToFile, logVerbose, logFilePath) {
+    let advice = '';
+    if (logToFile) {
+        advice += `\nSee log file: ${logFilePath}`;
+    }
+    if (!logVerbose) {
+        advice += '\nConsider setting .verbose() on your mock for more details.';
+    }
+    versionReader.runIfVersionAtLeast(0, 6, 2, () => {
+        advice += `\nRun 'imposter doctor' to diagnose engine issues.`
+    });
+    return advice;
 }
 
 function writeChunk(chunk, logVerbose, logToFile, consoleFn, logFileStream) {

@@ -6,16 +6,39 @@ class VersionReader {
      */
     _versionOutput;
 
+    async checkInit() {
+        if (!this._versionOutput) {
+            this._versionOutput = await this.invokeVersionCommand();
+        }
+    }
+
+    invokeVersionCommand() {
+        return new Promise((resolve, reject) => {
+            try {
+                exec('imposter version', (error, stdout, stderr) => {
+                    const output = `${stdout}\n${stderr}`;
+                    if (error) {
+                        reject(new Error(`Error determining version: ${error}\n${output}`));
+                    }
+                    resolve(output);
+                });
+            } catch (e) {
+                reject(new Error(`Error spawning Imposter process: ${e}`));
+            }
+        })
+    }
+
     /**
      * Determines the version of the CLI subcomponent.
      *
      * @param componentName {string}
-     * @returns {Promise<object>}
+     * @returns {{major: string, minor: string, revision: string}}
      */
-    async determineVersion(componentName) {
+    determineVersion(componentName) {
         if (!this._versionOutput) {
-            this._versionOutput = await this.invokeVersionCommand();
+            throw new Error('checkInit() not called');
         }
+
         try {
             /*
              * Parse CLI output in the form:
@@ -41,26 +64,10 @@ class VersionReader {
         }
     }
 
-    invokeVersionCommand() {
-        return new Promise((resolve, reject) => {
-            try {
-                exec('imposter version', (error, stdout, stderr) => {
-                    const output = `${stdout}\n${stderr}`;
-                    if (error) {
-                        reject(new Error(`Error determining version: ${error}\n${output}`));
-                    }
-                    resolve(output);
-                });
-            } catch (e) {
-                reject(new Error(`Error spawning Imposter process: ${e}`));
-            }
-        })
-    }
-
     /**
      * Determine the version of the CLI.
      *
-     * @returns {Promise<object>}
+     * @returns {{major: string, minor: string, revision: string}}
      */
     determineCliVersion() {
         return this.determineVersion(/imposter-cli/);
@@ -71,16 +78,17 @@ class VersionReader {
      *
      * @param major {number}
      * @param minor {number}
+     * @param revision {number}
      * @param block {function}
      * @param orElseBlock {function}
-     * @returns {Promise<*|undefined>}
+     * @returns {*|undefined}
      */
-    async runIfVersionAtLeast(major, minor, block, orElseBlock = undefined) {
-        const cliVersion = await this.determineCliVersion();
-        if (cliVersion.major >= major && cliVersion.minor >= minor) {
-            return await block();
+    runIfVersionAtLeast(major, minor, revision, block, orElseBlock = undefined) {
+        const cliVersion = this.determineCliVersion();
+        if (cliVersion.major >= major && cliVersion.minor >= minor && cliVersion.revision >= revision) {
+            return block();
         } else if (orElseBlock) {
-            return await orElseBlock();
+            return orElseBlock();
         }
         return undefined;
     }

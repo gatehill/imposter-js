@@ -8,7 +8,7 @@ afterAll(async () => {
     return mocks.stopAll();
 });
 
-it('builds a mock from an Imposter config file', async () => {
+it('builds a mock from an Imposter config dir', async () => {
     const configDir = `${process.cwd()}/test_data/full_config`;
     const mock = await mocks.start(configDir, 8080);
 

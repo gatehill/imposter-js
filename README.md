@@ -23,9 +23,6 @@ const response = await axios.get('http://localhost:8080/products');
 
 // print products
 console.log(response.data);
-
-// stop the mock
-mocks.stopAll();
 ```
 
 > See the [sample](https://github.com/gatehill/imposter-js/tree/main/sample) directory for a working Node.js project.
@@ -53,7 +50,11 @@ Or add to your `package.json` as a dev dependency:
 1. Install [Imposter CLI](https://github.com/gatehill/imposter-cli/blob/main/docs/install.md)
 2. Ensure you have _either_ [Docker installed](https://docs.docker.com/get-docker/) and running, or a [JVM installed](https://github.com/gatehill/imposter-cli/blob/main/docs/jvm_engine.md).
 
-## Example with Jest
+## Examples
+
+> See the [sample](https://github.com/gatehill/imposter-js/tree/main/sample) directory for a Node.js project containing many examples.
+
+### Example with Jest
 
 Here's an example using Jest:
 
@@ -87,7 +88,64 @@ it('places an order', async () => {
 });
 ```
 
-> See the [sample](https://github.com/gatehill/imposter-js/tree/main/sample) directory for a working Node.js project.
+### Example using just an OpenAPI file
+
+Here's an example mock that just uses an OpenAPI file:
+
+```js
+// build a mock from a bare OpenAPI spec file
+// requests are validated against the spec
+var mock = mocks.builder()
+    .withPort(8082)
+    .withOpenApiSpec('/path/to/pet-names-api.yaml')
+    .withRequestValidation()
+    .build();
+
+// spin it up
+await mock.start();
+
+// call the mock
+const response = await axios.get(`${mock.baseUrl()}/names`);
+
+// Output: [ 'Fluffy', 'Paws' ]
+// This is driven by either the 'examples' property
+// in the OpenAPI spec, or the schema of the response.
+console.log(response.data);
+```
+
+### Example with no config file
+
+Here's an example mock that doesn't require any configuration file:
+
+```js
+const builder = mocks.builder().withPort(8083).withPlugin('rest');
+
+// add a POST resource with a path parameter
+const resource = builder.addResource('/users/{userName}', 'POST');
+
+// capture the userName path parameter from the request
+// for later use in the response
+resource.captures().fromPath('userName');
+
+// respond with a dynamic message indicating the user
+// was created by name
+resource.responds(201)
+    .withData('${request.userName} registered')
+    .withHeader('Content-Type', 'text/plain')
+    .template();
+
+const mock = builder.build();
+
+// spin it up
+await mock.start();
+
+// call the mock
+const response = await axios.post(`${mock.baseUrl()}/users/alice`);
+
+// Output: alice registered
+// This will vary dynamically, based on the request.
+console.log(response.data);
+```
 
 ## Documentation
 

@@ -12,7 +12,7 @@ class UserService {
 
     async addUser(userName) {
         const response = await axios.post(`${this.baseUrl}/users/${userName}`);
-        console.log(`added user:`, response.data);
+        console.log(`add user response:`, response.data);
         return response.data;
     }
 }

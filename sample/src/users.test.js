@@ -19,36 +19,27 @@ jest.setTimeout(30000);
 let userService;
 
 beforeAll(async () => {
-    const config = {
-        plugin: 'rest',
-        resources: [
-            {
-                path: "/users/{userName}",
-                method: 'POST',
-                capture: {
-                    userName: {
-                        pathParam: "userName"
-                    }
-                },
-                response: {
-                    statusCode: 201,
-                    staticData: '{ "user": "${request.userName}", "status": "active" }',
-                    template: true,
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                }
-            }
-        ]
-    };
+    const builder = mocks.builder().withPort(8083).withPlugin('rest');
 
-    const mock = mocks.builder()
-        .withPort(8083)
-        .withConfig(config)
-        .build();
+    // add a POST resource with a path parameter
+    const resource = builder.addResource('/users/{userName}', 'POST');
+
+    // capture the userName path parameter from the request
+    // for later use in the response
+    resource.captures().fromPath('userName');
+
+    // respond with a dynamic message indicating the user
+    // was created by name
+    resource.responds(201)
+        .withData('${request.userName} registered')
+        .withHeader('Content-Type', 'text/plain')
+        .template();
+
+    const mock = builder.build();
 
     // set the base URL
-    userService = users('http://localhost:8083');
+    userService = users(mock.baseUrl());
+
     return mock.start();
 });
 
@@ -57,7 +48,6 @@ afterAll(async () => {
 })
 
 it('adds a user', async () => {
-    const user = await userService.addUser('alice');
-    expect(user.user).toEqual('alice');
-    expect(user.status).toEqual('active');
+    const response = await userService.addUser('alice');
+    expect(response).toEqual('alice registered');
 });

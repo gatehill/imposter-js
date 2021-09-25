@@ -47,7 +47,7 @@ it('builds a mock using resource builder', async () => {
     const resource = builder.addResource('/users/{userName}', 'POST');
 
     resource.captures().fromPath('userName');
-    resource.responds(201).withData('Hello ${request.userName}');
+    resource.responds(201).withTemplateData('Hello ${request.userName}');
 
     const mock = builder.build();
     await mock.start();

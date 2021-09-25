@@ -28,12 +28,11 @@ beforeAll(async () => {
     // for later use in the response
     resource.captures().fromPath('userName');
 
-    // respond with a dynamic message indicating the user
+    // respond with a templated message indicating the user
     // was created by name
     resource.responds(201)
-        .withData('${request.userName} registered')
-        .withHeader('Content-Type', 'text/plain')
-        .template();
+        .withTemplateData('${request.userName} registered')
+        .withHeader('Content-Type', 'text/plain');
 
     const mock = builder.build();
 

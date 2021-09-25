@@ -10,22 +10,22 @@ Embed live HTTP mocks within your tests, based on OpenAPI specification files or
 ```js
 const {mocks} = require('@imposter-js/imposter');
 
-// build a mock of an OpenAPI spec
-const mock = mocks.builder()
+// start a mock from an OpenAPI spec file
+await mocks.builder()
     .withPort(8080)
     .withOpenApiSpec('/path/to/openapi_spec.yaml')
-    .build();
+    .start();
 
-await mock.start();
-
-// call the mock
+// call one of the endpoints defined in the OpenAPI spec
 const response = await axios.get('http://localhost:8080/products');
 
-// print products
+// print JSON returned from the mock
 console.log(response.data);
 ```
 
-> See the [sample](https://github.com/gatehill/imposter-js/tree/main/sample) directory for a working Node.js project.
+This is just a simple example. Your mocks can have dynamic responses, request validation against an OpenAPI schema, data capture, performance delays etc...
+
+> See the [sample](https://github.com/gatehill/imposter-js/tree/main/sample) directory for a Node.js project with many examples.
 
 ## Quickstart
 
@@ -47,12 +47,12 @@ Or add to your `package.json` as a dev dependency:
 
 ## Prerequisites
 
-1. Install [Imposter CLI](https://github.com/gatehill/imposter-cli/blob/main/docs/install.md)
-2. Ensure you have _either_ [Docker installed](https://docs.docker.com/get-docker/) and running, or a [JVM installed](https://github.com/gatehill/imposter-cli/blob/main/docs/jvm_engine.md).
+- Install **[Imposter CLI](https://github.com/gatehill/imposter-cli/blob/main/docs/install.md)**. Supports macOS, Linux, Windows.
+- Ensure you satisfy the CLI requirements (either [Docker installed](https://docs.docker.com/get-docker/) and running, or a [JVM installed](https://github.com/gatehill/imposter-cli/blob/main/docs/jvm_engine.md)).
 
 ## Examples
 
-> See the [sample](https://github.com/gatehill/imposter-js/tree/main/sample) directory for a Node.js project containing many examples.
+> See the [sample](https://github.com/gatehill/imposter-js/tree/main/sample) directory for a Node.js project with many examples.
 
 ### Example with Jest
 
@@ -127,12 +127,11 @@ const resource = builder.addResource('/users/{userName}', 'POST');
 // for later use in the response
 resource.captures().fromPath('userName');
 
-// respond with a dynamic message indicating the user
+// respond with a templated message indicating the user
 // was created by name
 resource.responds(201)
-    .withData('${request.userName} registered')
-    .withHeader('Content-Type', 'text/plain')
-    .template();
+    .withTemplateData('${request.userName} registered')
+    .withHeader('Content-Type', 'text/plain');
 
 const mock = builder.build();
 

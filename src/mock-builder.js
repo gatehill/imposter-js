@@ -59,6 +59,24 @@ class ResourceResponse {
     }
 
     /**
+     * Convenience function equivalent to calling `withData(templateData)` then `template()`.
+     * @param templateData
+     * @return {ResourceResponse}
+     */
+    withTemplateData = (templateData) => {
+        return this.withData(templateData).template();
+    }
+
+    /**
+     * Convenience function equivalent to calling `withFile(templateFilePath)` then `template()`.
+     * @param templateFilePath
+     * @return {ResourceResponse}
+     */
+    withTemplateFile = (templateFilePath) => {
+        return this.withFile(templateFilePath).template();
+    }
+
+    /**
      * @param filePath {string}
      * @return {ResourceResponse}
      */

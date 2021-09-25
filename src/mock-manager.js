@@ -33,7 +33,7 @@ export class MockManager {
      * Start a mock using the Imposter configuration within `configDir`, listening
      * on `port`.
      *
-     * This is a convenience method that has limited options. Consider using `MockBuilder` instead:
+     * This is a convenience function that has limited options. Consider using `MockBuilder` instead:
      *
      * ```
      * const {mocks}

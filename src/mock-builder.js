@@ -59,7 +59,7 @@ class ResourceResponse {
     }
 
     /**
-     * Convenience function equivalent to calling `withData(templateData)` then `template()`.
+     * Convenience function equivalent to calling `withData(templateData).template()`.
      * @param templateData
      * @return {ResourceResponse}
      */
@@ -68,7 +68,7 @@ class ResourceResponse {
     }
 
     /**
-     * Convenience function equivalent to calling `withFile(templateFilePath)` then `template()`.
+     * Convenience function equivalent to calling `withFile(templateFilePath).template()`.
      * @param templateFilePath
      * @return {ResourceResponse}
      */
@@ -281,5 +281,13 @@ export class MockBuilder {
         fs.writeFileSync(mockConfigPath, JSON.stringify(this.config, null, '  '));
         nodeConsole.debug(`Wrote mock config to: ${mockConfigPath}`);
         return this.mockManager.prepare(this.configDir, this.port);
+    }
+
+    /**
+     * Convenience function equivalent to calling `build().start()`.
+     * @return {Promise<ConfiguredMock>}
+     */
+    start = () => {
+        return this.build().start();
     }
 }

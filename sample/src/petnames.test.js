@@ -1,4 +1,4 @@
-import {buildService} from "./petnames";
+import {PetNameService} from "./petnames";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
 import {mocks} from "imposter/src";
 
@@ -29,11 +29,11 @@ describe('pet name service', () => {
             .start();
 
         // set the base URL for the service
-        petNameService = buildService(mock.baseUrl());
+        petNameService = new PetNameService(mock.baseUrl());
     });
 
     afterAll(async () => {
-        return mocks.stopAll();
+        mocks.stopAll();
     });
 
     it('generates pet names', async () => {

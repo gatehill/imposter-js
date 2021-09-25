@@ -4,7 +4,7 @@ import {versionReader} from "../version";
 
 /**
  * The majority of coverage for `ConfiguredMock` comes via
- * the `MockBuilder` tests and integrated tests.
+ * the `MockBuilder` tests and the end to end tests.
  */
 
 const utils = new Utils();

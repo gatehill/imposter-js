@@ -1,4 +1,3 @@
-
 ## Examples
 
 > See the [sample](https://github.com/gatehill/imposter-js/tree/main/sample) directory for a Node.js project with many examples.
@@ -13,17 +12,16 @@ const {mocks} = require('@imposter-js/imposter');
 jest.setTimeout(30000);
 
 beforeAll(async () => {
-    // path to Imposter config directory, relative to the test file
-    const configDir = `${__dirname}/../order-api`;
+    // path to Imposter config directory
+    const configDir = `/path/to/order-api`;
 
-    // start the mocks (returns a Promise) using an existing
-    // Imposter config file in the 'order-api' directory
-    return mocks.start(configDir, 8080);
+    // start a mock on a specific port
+    await mocks.start(configDir, 8080);
 });
 
 afterAll(async () => {
-    return mocks.stopAll();
-})
+    mocks.stopAll();
+});
 
 it('places an order', async () => {
     // configure the unit under test
@@ -32,7 +30,7 @@ it('places an order', async () => {
     // call your unit under test, which invokes the mock
     const confirmation = await orderService.placeOrder('product-05');
 
-    // assert values returned to the unit under test by the mock
+    // assert values returned by the mock
     expect(confirmation.total).toEqual(18.00);
 });
 ```
@@ -42,16 +40,12 @@ it('places an order', async () => {
 Here's an example mock that just uses an OpenAPI file:
 
 ```js
-// build a mock from a bare OpenAPI spec file
+// start a mock from a bare OpenAPI spec file
 // requests are validated against the spec
-var mock = mocks.builder()
-    .withPort(8082)
+const mock = await mocks.builder()
     .withOpenApiSpec('/path/to/pet-names-api.yaml')
     .withRequestValidation()
-    .build();
-
-// spin it up
-await mock.start();
+    .start();
 
 // call the mock
 const response = await axios.get(`${mock.baseUrl()}/names`);
@@ -67,7 +61,7 @@ console.log(response.data);
 Here's an example mock that doesn't require any configuration file:
 
 ```js
-const builder = mocks.builder().withPort(8083).withPlugin('rest');
+const builder = mocks.builder().withPlugin('rest');
 
 // add a POST resource with a path parameter
 const resource = builder.addResource('/users/{userName}', 'POST');
@@ -82,10 +76,8 @@ resource.responds(201)
     .withTemplateData('${request.userName} registered')
     .withHeader('Content-Type', 'text/plain');
 
-const mock = builder.build();
-
 // spin it up
-await mock.start();
+const mock = await builder.start();
 
 // call the mock
 const response = await axios.post(`${mock.baseUrl()}/users/alice`);

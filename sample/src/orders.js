@@ -26,8 +26,4 @@ class OrderService {
     }
 }
 
-const buildService = (baseUrl) => {
-    return new OrderService(baseUrl);
-};
-
-export {buildService};
+export {OrderService};

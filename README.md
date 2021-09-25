@@ -67,14 +67,13 @@ beforeAll(async () => {
     // path to Imposter config directory
     const configDir = `/path/to/order-api`;
 
-    // start the mock on a specific port
-    // (returns a Promise that Jest resolves)
-    return mocks.start(configDir, 8080);
+    // start a mock on a specific port
+    await mocks.start(configDir, 8080);
 });
 
 afterAll(async () => {
-    return mocks.stopAll();
-})
+    mocks.stopAll();
+});
 
 it('places an order', async () => {
     // configure the unit under test
@@ -93,15 +92,12 @@ it('places an order', async () => {
 Here's an example mock that just uses an OpenAPI file:
 
 ```js
-// build a mock from a bare OpenAPI spec file
+// start a mock from a bare OpenAPI spec file
 // requests are validated against the spec
-var mock = mocks.builder()
+const mock = await mocks.builder()
     .withOpenApiSpec('/path/to/pet-names-api.yaml')
     .withRequestValidation()
-    .build();
-
-// spin it up
-await mock.start();
+    .start();
 
 // call the mock
 const response = await axios.get(`${mock.baseUrl()}/names`);
@@ -132,10 +128,8 @@ resource.responds(201)
     .withTemplateData('${request.userName} registered')
     .withHeader('Content-Type', 'text/plain');
 
-const mock = builder.build();
-
 // spin it up
-await mock.start();
+const mock = await builder.start();
 
 // call the mock
 const response = await axios.post(`${mock.baseUrl()}/users/alice`);

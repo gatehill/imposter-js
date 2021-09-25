@@ -5,99 +5,101 @@ import {MockManager} from "../mock-manager";
 
 jest.setTimeout(30000);
 
-afterAll(async () => {
-    return mocks.stopAll();
-});
+describe('end to end tests', () => {
+    afterAll(async () => {
+        return mocks.stopAll();
+    });
 
-it('starts a mock from an Imposter config dir', async () => {
-    const configDir = `${__dirname}/testdata/full_config`;
-    const mock = await mocks.start(configDir, 8080);
+    it('starts a mock from an Imposter config dir', async () => {
+        const configDir = `${__dirname}/test_data/full_config`;
+        const mock = await mocks.start(configDir, 8080);
 
-    const response = await axios.get(`${mock.baseUrl()}/products`);
-    expect(response.status).toEqual(200);
+        const response = await axios.get(`${mock.baseUrl()}/products`);
+        expect(response.status).toEqual(200);
 
-    const products = response.data;
-    expect(products).toHaveLength(2);
-    expect(products[0].name).toEqual('Food bowl');
-});
+        const products = response.data;
+        expect(products).toHaveLength(2);
+        expect(products[0].name).toEqual('Food bowl');
+    });
 
-it('starts a mock from a bare OpenAPI spec', async () => {
-    const specFile = `${__dirname}/testdata/bare_openapi/pet-name-service.yaml`;
-    const mock = mocks.builder()
-        .withPort(8081)
-        .withOpenApiSpec(specFile)
-        .withRequestValidation()
-        .build();
+    it('starts a mock from a bare OpenAPI spec', async () => {
+        const specFile = `${__dirname}/test_data/bare_openapi/pet-name-service.yaml`;
+        const mock = mocks.builder()
+            .withPort(8081)
+            .withOpenApiSpec(specFile)
+            .withRequestValidation()
+            .build();
 
-    await mock.start();
+        await mock.start();
 
-    const response = await axios.get(`${mock.baseUrl()}/names`);
-    expect(response.status).toEqual(200);
+        const response = await axios.get(`${mock.baseUrl()}/names`);
+        expect(response.status).toEqual(200);
 
-    const names = response.data;
-    expect(names).toHaveLength(2);
-    expect(names[0]).toEqual('Fluffy');
-});
+        const names = response.data;
+        expect(names).toHaveLength(2);
+        expect(names[0]).toEqual('Fluffy');
+    });
 
-it('starts a mock using resource builder', async () => {
-    const builder = mocks.builder()
-        .withPort(8083)
-        .withPlugin('rest');
+    it('starts a mock using resource builder', async () => {
+        const builder = mocks.builder()
+            .withPort(8083)
+            .withPlugin('rest');
 
-    const resource = builder.addResource('/users/{userName}', 'POST');
+        const resource = builder.addResource('/users/{userName}', 'POST');
 
-    resource.captures().fromPath('userName');
-    resource.responds(201).withTemplateData('Hello ${request.userName}');
+        resource.captures().fromPath('userName');
+        resource.responds(201).withTemplateData('Hello ${request.userName}');
 
-    const mock = builder.build();
-    await mock.start();
+        const mock = builder.build();
+        await mock.start();
 
-    const response = await axios.post(`${mock.baseUrl()}/users/alice`);
-    expect(response.status).toEqual(201);
-    expect(response.data).toEqual('Hello alice');
-});
+        const response = await axios.post(`${mock.baseUrl()}/users/alice`);
+        expect(response.status).toEqual(201);
+        expect(response.data).toEqual('Hello alice');
+    });
 
-it('starts a mock on random free port', async () => {
-    const builder = mocks.builder().withPlugin('rest');
-    builder.addResource('/example').responds().withData('Hello world');
-    const mock = await builder.start();
+    it('starts a mock on random free port', async () => {
+        const builder = mocks.builder().withPlugin('rest');
+        builder.addResource('/example').responds().withData('Hello world');
+        const mock = await builder.start();
 
-    // port should be auto-assigned
-    expect(mock.port).toBeTruthy();
+        // port should be auto-assigned
+        expect(mock.port).toBeTruthy();
 
-    const response = await axios.get(`${mock.baseUrl()}/example`);
-    expect(response.status).toEqual(200);
-    expect(response.data).toEqual('Hello world');
-});
+        const response = await axios.get(`${mock.baseUrl()}/example`);
+        expect(response.status).toEqual(200);
+        expect(response.data).toEqual('Hello world');
+    });
 
-it('builds a mock from raw config', async () => {
-    const config = {
-        plugin: 'rest',
-        resources: [
-            {
-                path: "/example",
-                method: 'POST',
-                response: {
-                    statusCode: 201,
-                    staticData: 'Hello world'
+    it('builds a mock from raw config', async () => {
+        const config = {
+            plugin: 'rest',
+            resources: [
+                {
+                    path: "/example",
+                    method: 'POST',
+                    response: {
+                        statusCode: 201,
+                        staticData: 'Hello world'
+                    }
                 }
-            }
-        ]
-    };
+            ]
+        };
 
-    const mock = mocks.builder()
-        .withPort(8082)
-        .withConfig(config)
-        .build();
+        const mock = mocks.builder()
+            .withPort(8082)
+            .withConfig(config)
+            .build();
 
-    await mock.start();
+        await mock.start();
 
-    const response = await axios.post(`${mock.baseUrl()}/example`);
-    expect(response.status).toEqual(201);
-    expect(response.data).toEqual('Hello world');
-});
+        const response = await axios.post(`${mock.baseUrl()}/example`);
+        expect(response.status).toEqual(201);
+        expect(response.data).toEqual('Hello world');
+    });
 
-it('returns deprecated manager', async () => {
-    const legacyManager = require('../index').default();
-    expect(legacyManager).toBeInstanceOf(MockManager);
+    it('returns deprecated manager', async () => {
+        const legacyManager = require('../index').default();
+        expect(legacyManager).toBeInstanceOf(MockManager);
+    });
 });

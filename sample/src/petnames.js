@@ -22,8 +22,4 @@ class PetNameService {
     }
 }
 
-const buildService = (baseUrl) => {
-    return new PetNameService(baseUrl);
-};
-
-export {buildService};
+export {PetNameService};

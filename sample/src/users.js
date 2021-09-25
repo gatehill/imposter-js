@@ -17,8 +17,4 @@ class UserService {
     }
 }
 
-const buildService = (baseUrl) => {
-    return new UserService(baseUrl);
-};
-
-export {buildService};
+export {UserService};

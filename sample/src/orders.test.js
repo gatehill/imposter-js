@@ -29,7 +29,7 @@ describe('order service', () => {
     });
 
     afterAll(async () => {
-        return mocks.stopAll();
+        mocks.stopAll();
     });
 
     it('places an order', async () => {

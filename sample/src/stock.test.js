@@ -1,4 +1,4 @@
-import {buildService} from "./stock";
+import {StockService} from "./stock";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
 import {mocks} from "imposter/src";
 
@@ -24,11 +24,11 @@ describe('stock service', () => {
         const mock = await mocks.start(configDir);
 
         // set the base URL for the service
-        stockService = buildService(mock.baseUrl());
+        stockService = new StockService(mock.baseUrl());
     });
 
     afterAll(async () => {
-        return mocks.stopAll();
+        mocks.stopAll();
     });
 
     it('fetches available stock', async () => {

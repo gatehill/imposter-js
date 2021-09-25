@@ -1,4 +1,4 @@
-import App from "./index";
+import {PetStore} from "./index";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
 import {mocks} from "imposter/src";
 
@@ -24,31 +24,30 @@ describe('petstore application', () => {
     let app;
 
     beforeAll(async () => {
-        const mockPromises = {};
-
         // spin up a mock for each API
-        apisToMock.forEach(apiName => {
+        const mockPromises = {};
+        for (const apiName of apisToMock) {
             const configDir = `${__dirname}/../apis/${apiName}-api`;
             mockPromises[apiName] = mocks.start(configDir);
-        })
+        }
 
+        // wait for mocks to come up, then get URL
         const baseUrls = {};
         for (const apiName of apisToMock) {
-            // wait for mock to come up
             const mock = await mockPromises[apiName];
             baseUrls[apiName] = mock.baseUrl();
         }
 
         // configure app with endpoints
-        app = App(baseUrls)
+        app = new PetStore(baseUrls)
     });
 
     afterAll(async () => {
-        return mocks.stopAll();
+        mocks.stopAll();
     });
 
     it('order item in stock', async () => {
-        const confirmation = await app.orderItemInStock();
+        const confirmation = await app.orderFirstItemInStock();
         expect(confirmation.total).toEqual(13.00);
     });
 });

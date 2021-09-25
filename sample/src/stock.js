@@ -22,8 +22,4 @@ class StockService {
     }
 }
 
-const buildService = (baseUrl) => {
-    return new StockService(baseUrl);
-};
-
-export {buildService};
+export {StockService};

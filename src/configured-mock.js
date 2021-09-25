@@ -151,7 +151,10 @@ export class ConfiguredMock {
             }
         }
         if (this.logFileStream) {
-            this.logFileStream.close();
+            try {
+                this.logFileStream.close();
+            } catch (ignored) {
+            }
         }
     }
 

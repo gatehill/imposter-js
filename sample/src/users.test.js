@@ -1,4 +1,4 @@
-import {buildService} from "./users";
+import {UserService} from "./users";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
 import {mocks} from "imposter/src";
 
@@ -38,11 +38,11 @@ describe('user service', () => {
         const mock = await builder.start();
 
         // set the base URL for the service
-        userService = buildService(mock.baseUrl());
+        userService = new UserService(mock.baseUrl());
     });
 
     afterAll(async () => {
-        return mocks.stopAll();
+        mocks.stopAll();
     });
 
     it('adds a user', async () => {

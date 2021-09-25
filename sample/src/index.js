@@ -1,10 +1,10 @@
-import {buildService as buildStockService} from "./stock";
-import {buildService as buildOrderService} from "./orders";
+import {StockService} from "./stock";
+import {OrderService} from "./orders";
 
 /**
- * A simple application that chains calls for some of the services.
+ * A simple pet store application that chains calls for some of the services.
  */
-class App {
+class PetStore {
     stockService;
     orderService;
 
@@ -12,8 +12,8 @@ class App {
      * @param config {{stock: string, order: string}}
      */
     constructor(config) {
-        this.stockService = buildStockService(config.stock);
-        this.orderService = buildOrderService(config.order);
+        this.stockService = new StockService(config.stock);
+        this.orderService = new OrderService(config.order);
     }
 
     /**
@@ -21,7 +21,7 @@ class App {
      *
      * @returns {Promise<Object>}
      */
-    orderItemInStock = async () => {
+    orderFirstItemInStock = async () => {
         const products = await this.stockService.listStock();
 
         // order the first item in stock
@@ -34,6 +34,4 @@ class App {
     };
 }
 
-module.exports = (config) => {
-    return new App(config);
-}
+export {PetStore};

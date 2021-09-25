@@ -1,5 +1,5 @@
-import stock from "./stock";
-import orders from "./orders";
+import {buildService as buildStockService} from "./stock";
+import {buildService as buildOrderService} from "./orders";
 
 /**
  * A simple application that chains calls for some of the services.
@@ -8,9 +8,12 @@ class App {
     stockService;
     orderService;
 
+    /**
+     * @param config {{stock: string, order: string}}
+     */
     constructor(config) {
-        this.stockService = stock(config.stockBaseUrl);
-        this.orderService = orders(config.ordersBaseUrl);
+        this.stockService = buildStockService(config.stock);
+        this.orderService = buildOrderService(config.order);
     }
 
     /**

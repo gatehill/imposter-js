@@ -16,11 +16,10 @@ export class MockManager {
 
     /**
      * @param configDir {string}
-     * @param port {number}
+     * @param port {number|null}
      * @return {ConfiguredMock}
      */
-    prepare = (configDir, port) => {
-        port = port ? port : 8080;
+    prepare = (configDir, port = null) => {
         const mock = new ConfiguredMock(configDir, port);
         if (this._logVerbose) {
             mock.verbose();
@@ -40,10 +39,10 @@ export class MockManager {
      * ```
      *
      * @param configDir {string}
-     * @param port {number}
+     * @param port {number|null}
      * @return {Promise<ConfiguredMock>}
      */
-    start = (configDir, port) => {
+    start = (configDir, port = null) => {
         return this.prepare(configDir, port).start();
     }
 

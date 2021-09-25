@@ -1,4 +1,4 @@
-import users from "./users";
+import {buildService} from "./users";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
 import {mocks} from "imposter/src";
 
@@ -16,37 +16,37 @@ import {mocks} from "imposter/src";
 
 jest.setTimeout(30000);
 
-let userService;
+describe('user service', () => {
+    let userService;
 
-beforeAll(async () => {
-    const builder = mocks.builder().withPort(8083).withPlugin('rest');
+    beforeAll(async () => {
+        const builder = mocks.builder().withPlugin('rest');
 
-    // add a POST resource with a path parameter
-    const resource = builder.addResource('/users/{userName}', 'POST');
+        // add a POST resource with a path parameter
+        const resource = builder.addResource('/users/{userName}', 'POST');
 
-    // capture the userName path parameter from the request
-    // for later use in the response
-    resource.captures().fromPath('userName');
+        // capture the userName path parameter from the request
+        // for later use in the response
+        resource.captures().fromPath('userName');
 
-    // respond with a templated message indicating the user
-    // was created by name
-    resource.responds(201)
-        .withTemplateData('${request.userName} registered')
-        .withHeader('Content-Type', 'text/plain');
+        // respond with a templated message indicating the user
+        // was created by name
+        resource.responds(201)
+            .withTemplateData('${request.userName} registered')
+            .withHeader('Content-Type', 'text/plain');
 
-    const mock = builder.build();
+        const mock = await builder.start();
 
-    // set the base URL
-    userService = users(mock.baseUrl());
+        // set the base URL for the service
+        userService = buildService(mock.baseUrl());
+    });
 
-    return mock.start();
-});
+    afterAll(async () => {
+        return mocks.stopAll();
+    });
 
-afterAll(async () => {
-    return mocks.stopAll();
-})
-
-it('adds a user', async () => {
-    const response = await userService.addUser('alice');
-    expect(response).toEqual('alice registered');
+    it('adds a user', async () => {
+        const response = await userService.addUser('alice');
+        expect(response).toEqual('alice registered');
+    });
 });

@@ -17,6 +17,8 @@ class UserService {
     }
 }
 
-module.exports = (baseUrl) => {
+const buildService = (baseUrl) => {
     return new UserService(baseUrl);
-}
+};
+
+export {buildService};

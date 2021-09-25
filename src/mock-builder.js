@@ -191,6 +191,11 @@ export class MockBuilder {
     configDir;
 
     /**
+     * @type {number}
+     */
+    port;
+
+    /**
      * @param mockManager {MockManager}
      */
     constructor(mockManager) {

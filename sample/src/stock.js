@@ -22,6 +22,8 @@ class StockService {
     }
 }
 
-module.exports = (baseUrl) => {
+const buildService = (baseUrl) => {
     return new StockService(baseUrl);
-}
+};
+
+export {buildService};

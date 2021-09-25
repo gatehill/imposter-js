@@ -26,6 +26,8 @@ class OrderService {
     }
 }
 
-module.exports = (baseUrl) => {
-    return new OrderService(baseUrl)
+const buildService = (baseUrl) => {
+    return new OrderService(baseUrl);
 };
+
+export {buildService};

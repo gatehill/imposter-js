@@ -13,42 +13,42 @@ import {mocks} from "imposter/src";
  *   const {mocks} = require("@imposter-js/imposter");
  */
 
-const apisToMock = {
-    stockService: {dir: 'stock-service', port: 9080},
-    orderService: {dir: 'order-service', port: 9081},
-};
+const apisToMock = [
+    'stock',
+    'order',
+];
 
 jest.setTimeout(30000);
 
-let app;
+describe('petstore application', () => {
+    let app;
 
-beforeAll(async () => {
-    const mockInstances = [];
+    beforeAll(async () => {
+        const mockPromises = {};
 
-    // spin up a mock for each API
-    for (const t in apisToMock) {
-        const api = apisToMock[t];
-        const configDir = `${__dirname}/../apis/${api.dir}`;
+        // spin up a mock for each API
+        apisToMock.forEach(apiName => {
+            const configDir = `${__dirname}/../apis/${apiName}-api`;
+            mockPromises[apiName] = mocks.start(configDir);
+        })
 
-        mockInstances.push(
-            mocks.start(configDir, api.port)
-        );
-    }
+        const baseUrls = {};
+        for (const apiName of apisToMock) {
+            // wait for mock to come up
+            const mock = await mockPromises[apiName];
+            baseUrls[apiName] = mock.baseUrl();
+        }
 
-    // configure app with endpoints
-    app = App({
-        stockBaseUrl: `http://localhost:${apisToMock.stockService.port}`,
-        ordersBaseUrl: `http://localhost:${apisToMock.orderService.port}`,
-    })
+        // configure app with endpoints
+        app = App(baseUrls)
+    });
 
-    return Promise.all(mockInstances);
-});
+    afterAll(async () => {
+        return mocks.stopAll();
+    });
 
-afterAll(async () => {
-    return mocks.stopAll();
-})
-
-it('order item in stock', async () => {
-    const confirmation = await app.orderItemInStock();
-    expect(confirmation.total).toEqual(13.00);
+    it('order item in stock', async () => {
+        const confirmation = await app.orderItemInStock();
+        expect(confirmation.total).toEqual(13.00);
+    });
 });

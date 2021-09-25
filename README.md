@@ -10,7 +10,7 @@ Embed live HTTP mocks within your tests, based on OpenAPI specification files or
 ```js
 const {mocks} = require('@imposter-js/imposter');
 
-// start a mock from an OpenAPI spec file
+// start a mock from an OpenAPI spec file on a specific port
 await mocks.builder()
     .withPort(8080)
     .withOpenApiSpec('/path/to/openapi_spec.yaml')
@@ -64,11 +64,11 @@ const {mocks} = require('@imposter-js/imposter');
 jest.setTimeout(30000);
 
 beforeAll(async () => {
-    // path to Imposter config directory, relative to the test file
-    const configDir = `${__dirname}/../order-api`;
+    // path to Imposter config directory
+    const configDir = `/path/to/order-api`;
 
-    // start the mocks (returns a Promise) using an existing
-    // Imposter config file in the 'order-api' directory
+    // start the mock on a specific port
+    // (returns a Promise that Jest resolves)
     return mocks.start(configDir, 8080);
 });
 
@@ -83,7 +83,7 @@ it('places an order', async () => {
     // call your unit under test, which invokes the mock
     const confirmation = await orderService.placeOrder('product-05');
 
-    // assert values returned to the unit under test by the mock
+    // assert values returned by the mock
     expect(confirmation.total).toEqual(18.00);
 });
 ```
@@ -96,7 +96,6 @@ Here's an example mock that just uses an OpenAPI file:
 // build a mock from a bare OpenAPI spec file
 // requests are validated against the spec
 var mock = mocks.builder()
-    .withPort(8082)
     .withOpenApiSpec('/path/to/pet-names-api.yaml')
     .withRequestValidation()
     .build();
@@ -118,7 +117,7 @@ console.log(response.data);
 Here's an example mock that doesn't require any configuration file:
 
 ```js
-const builder = mocks.builder().withPort(8083).withPlugin('rest');
+const builder = mocks.builder().withPlugin('rest');
 
 // add a POST resource with a path parameter
 const resource = builder.addResource('/users/{userName}', 'POST');

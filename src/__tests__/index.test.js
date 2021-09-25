@@ -9,7 +9,7 @@ afterAll(async () => {
     return mocks.stopAll();
 });
 
-it('builds a mock from an Imposter config dir', async () => {
+it('starts a mock from an Imposter config dir', async () => {
     const configDir = `${__dirname}/testdata/full_config`;
     const mock = await mocks.start(configDir, 8080);
 
@@ -21,7 +21,7 @@ it('builds a mock from an Imposter config dir', async () => {
     expect(products[0].name).toEqual('Food bowl');
 });
 
-it('builds a mock from a bare OpenAPI spec', async () => {
+it('starts a mock from a bare OpenAPI spec', async () => {
     const specFile = `${__dirname}/testdata/bare_openapi/pet-name-service.yaml`;
     const mock = mocks.builder()
         .withPort(8081)
@@ -39,7 +39,7 @@ it('builds a mock from a bare OpenAPI spec', async () => {
     expect(names[0]).toEqual('Fluffy');
 });
 
-it('builds a mock using resource builder', async () => {
+it('starts a mock using resource builder', async () => {
     const builder = mocks.builder()
         .withPort(8083)
         .withPlugin('rest');
@@ -55,6 +55,19 @@ it('builds a mock using resource builder', async () => {
     const response = await axios.post(`${mock.baseUrl()}/users/alice`);
     expect(response.status).toEqual(201);
     expect(response.data).toEqual('Hello alice');
+});
+
+it('starts a mock on random free port', async () => {
+    const builder = mocks.builder().withPlugin('rest');
+    builder.addResource('/example').responds().withData('Hello world');
+    const mock = await builder.start();
+
+    // port should be auto-assigned
+    expect(mock.port).toBeTruthy();
+
+    const response = await axios.get(`${mock.baseUrl()}/example`);
+    expect(response.status).toEqual(200);
+    expect(response.data).toEqual('Hello world');
 });
 
 it('builds a mock from raw config', async () => {

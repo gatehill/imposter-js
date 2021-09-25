@@ -19,17 +19,17 @@ The following APIs are mocked:
 
 ### order-service
 
-Defined using OpenAPI specifications under the `apis/order-service` directory.
+Defined using OpenAPI specifications under the `apis/order-api` directory.
 
 The directory also contains Imposter configuration files, as well as dynamic scripts to synthesise an order confirmation.
 
 ### pet-name-service
 
-A bare directory under `apis/pet-name-service` containing only an OpenAPI file, with the Imposter configuration generated when the mock starts.
+A bare directory under `apis/pet-name-api` containing only an OpenAPI file, with the Imposter configuration generated when the mock starts.
 
 ### stock-service
 
-Defined using OpenAPI specifications under the `apis/stock-service` directory.
+Defined using OpenAPI specifications under the `apis/stock-api` directory.
 
 The directory also contains Imposter configuration files, but no dynamic scripts.
 

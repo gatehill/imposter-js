@@ -22,6 +22,8 @@ class PetNameService {
     }
 }
 
-module.exports = (baseUrl) => {
+const buildService = (baseUrl) => {
     return new PetNameService(baseUrl);
-}
+};
+
+export {buildService};

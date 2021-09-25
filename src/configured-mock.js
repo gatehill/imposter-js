@@ -5,6 +5,7 @@ import {spawn} from "child_process";
 import path from "path";
 import fs from "fs";
 import os from "os";
+import net from "net";
 import {httpGet} from "./healthcheck";
 
 export class ConfiguredMock {
@@ -14,7 +15,7 @@ export class ConfiguredMock {
     configDir;
 
     /**
-     * @type {number}
+     * @type {number|null}
      */
     port;
 
@@ -33,7 +34,11 @@ export class ConfiguredMock {
      */
     utils;
 
-    constructor(configDir, port) {
+    /**
+     * @param configDir {string}
+     * @param port {number|null}
+     */
+    constructor(configDir, port = null) {
         this.configDir = configDir;
         this.port = port;
         this.utils = new Utils();
@@ -50,6 +55,12 @@ export class ConfiguredMock {
             await fileUtils.initIfRequired();
         } catch (e) {
             throw new Error(`Error during initialisation: ${e}`);
+        }
+        if (!this.port) {
+            this.port = await this.utils.assignFreePort();
+            if (this.logVerbose) {
+                nodeConsole.debug(`Assigned free port ${this.port}`);
+            }
         }
 
         const localConfigFile = fileUtils.discoverLocalConfig();
@@ -156,6 +167,9 @@ export class ConfiguredMock {
      * @return {string}
      */
     baseUrl = () => {
+        if (!this.port) {
+            throw new Error('Cannot get base URL before starting mock unless port explicitly set');
+        }
         return `http://localhost:${this.port}`;
     }
 }
@@ -193,6 +207,22 @@ export class Utils {
     sleep = (ms) => {
         return new Promise((resolve) => {
             setTimeout(resolve, ms);
+        });
+    }
+
+    assignFreePort = async () => {
+        return new Promise((resolve, reject) => {
+            try {
+                const srv = net.createServer();
+                srv.listen(0, () => {
+                    const port = srv.address().port;
+                    srv.close(() => {
+                        resolve(port);
+                    });
+                });
+            } catch (e) {
+                reject(e);
+            }
         });
     }
 }

@@ -1,11 +1,11 @@
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
-import orders from "./orders";
+import {buildService} from "./orders";
 import {mocks} from "imposter/src";
 
 /**
  * Tests for order-service mock.
  *
- * Defined using OpenAPI specifications under the `apis/order-service` directory.
+ * Defined using OpenAPI specifications under the `apis/order-api` directory.
  * The directory also contains Imposter configuration files, as well as dynamic scripts to synthesise
  * an order confirmation.
  *
@@ -17,26 +17,27 @@ import {mocks} from "imposter/src";
 
 jest.setTimeout(30000);
 
-let orderService;
+describe('order service', () => {
+    let orderService;
 
-beforeAll(async () => {
-    const configDir = `${__dirname}/../apis/order-service`;
-    const mock = mocks.start(configDir, 8081);
+    beforeAll(async () => {
+        const configDir = `${__dirname}/../apis/order-api`;
+        const mock = await mocks.start(configDir);
 
-    // set the base URL
-    orderService = orders('http://localhost:8081');
-    return mock;
-});
+        // set the base URL for the service
+        orderService = buildService(mock.baseUrl());
+    });
 
-afterAll(async () => {
-    return mocks.stopAll();
-})
+    afterAll(async () => {
+        return mocks.stopAll();
+    });
 
-it('places an order', async () => {
-    const orderItems = [
-        {sku: "fb01"},
-        {sku: "br06"},
-    ];
-    const confirmation = await orderService.placeOrder(orderItems);
-    expect(confirmation.total).toEqual(18.00);
+    it('places an order', async () => {
+        const orderItems = [
+            {sku: "fb01"},
+            {sku: "br06"},
+        ];
+        const confirmation = await orderService.placeOrder(orderItems);
+        expect(confirmation.total).toEqual(18.00);
+    });
 });

@@ -1,11 +1,11 @@
-import petnames from "./petnames";
+import {buildService} from "./petnames";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
 import {mocks} from "imposter/src";
 
 /**
  * Tests for pet-name-service mock
  *
- * A bare directory under `apis/pet-name-service` containing only an OpenAPI file,
+ * A bare directory under `apis/pet-name-api` containing only an OpenAPI file,
  * with the Imposter configuration generated when the mock starts.
  *
  * Important: In your own project, change the import to:
@@ -16,29 +16,29 @@ import {mocks} from "imposter/src";
 
 jest.setTimeout(30000);
 
-let petNameService;
+describe('pet name service', () => {
+    let petNameService;
 
-beforeAll(async () => {
-    const specPath = `${__dirname}/../apis/pet-name-service/pet-name-service.yaml`;
+    beforeAll(async () => {
+        const specPath = `${__dirname}/../apis/pet-name-api/pet-name-service.yaml`;
 
-    // build a mock from a bare OpenAPI spec file
-    const mock = mocks.builder()
-        .withPort(8082)
-        .withOpenApiSpec(specPath)
-        .withRequestValidation()
-        .build();
+        // build a mock from a bare OpenAPI spec file
+        const mock = await mocks.builder()
+            .withOpenApiSpec(specPath)
+            .withRequestValidation()
+            .start();
 
-    // set the base URL
-    petNameService = petnames('http://localhost:8082');
-    return mock.start();
-});
+        // set the base URL for the service
+        petNameService = buildService(mock.baseUrl());
+    });
 
-afterAll(async () => {
-    return mocks.stopAll();
-})
+    afterAll(async () => {
+        return mocks.stopAll();
+    });
 
-it('generates pet names', async () => {
-    const names = await petNameService.suggestNames();
-    expect(names).toHaveLength(2);
-    expect(names[0]).toEqual('Fluffy');
+    it('generates pet names', async () => {
+        const names = await petNameService.suggestNames();
+        expect(names).toHaveLength(2);
+        expect(names[0]).toEqual('Fluffy');
+    });
 });

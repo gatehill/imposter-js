@@ -6,7 +6,7 @@ import path from "path";
 
 describe('mock builder', () => {
     it('builds an openapi mock', async () => {
-        const specFile = `${__dirname}/test_data/bare_openapi/pet-name-service.yaml`;
+        const specFile = `${__dirname}/test_data/bare_openapi/pet-name-api.yaml`;
 
         // manual mock
         const mockManager = new MockManager();
@@ -17,7 +17,7 @@ describe('mock builder', () => {
             .withRequestValidation();
 
         expect(builder.config.plugin).toEqual('openapi');
-        expect(builder.config.specFile).toEqual('pet-name-service.yaml');
+        expect(builder.config.specFile).toEqual('pet-name-api.yaml');
         expect(builder.config.validation).toBeTruthy();
         expect(builder.config.validation.request).toBe(true);
         expect(builder.config.validation.levels).toBeTruthy();
@@ -28,7 +28,7 @@ describe('mock builder', () => {
 
         const configObj = await readConfigFile(builder);
         expect(configObj.plugin).toEqual('openapi');
-        expect(configObj.specFile).toEqual('pet-name-service.yaml');
+        expect(configObj.specFile).toEqual('pet-name-api.yaml');
     });
 
     it('builds a mock from raw config', async () => {

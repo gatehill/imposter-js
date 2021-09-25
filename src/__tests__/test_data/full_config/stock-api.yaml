@@ -4,7 +4,7 @@
 openapi: "3.0.1"
 
 info:
-  title: Sample Petstore order service
+  title: Sample Petstore stock service
   description: This is a sample OpenAPI specification describing a service for managing stock.
   contact:
     name: Pete Cornish

@@ -1,5 +1,5 @@
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
-import {buildService} from "./orders";
+import {OrderService} from "./orders";
 import {mocks} from "imposter/src";
 
 /**
@@ -25,7 +25,7 @@ describe('order service', () => {
         const mock = await mocks.start(configDir);
 
         // set the base URL for the service
-        orderService = buildService(mock.baseUrl());
+        orderService = new OrderService(mock.baseUrl());
     });
 
     afterAll(async () => {

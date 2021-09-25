@@ -20,7 +20,7 @@ describe('pet name service', () => {
     let petNameService;
 
     beforeAll(async () => {
-        const specPath = `${__dirname}/../apis/pet-name-api/pet-name-service.yaml`;
+        const specPath = `${__dirname}/../apis/pet-name-api/pet-name-api.yaml`;
 
         // build a mock from a bare OpenAPI spec file
         const mock = await mocks.builder()

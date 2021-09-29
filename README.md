@@ -1,5 +1,4 @@
-Imposter Mock Engine
-====================
+# Imposter Mock Engine [![CI](https://github.com/gatehill/imposter-js/actions/workflows/ci.yaml/badge.svg)](https://github.com/gatehill/imposter-js/actions/workflows/ci.yaml)
 
 Bindings for using the [Imposter mock engine](https://github.com/outofcoffee/imposter/) in JavaScript/Node.js.
 

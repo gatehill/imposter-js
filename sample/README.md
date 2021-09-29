@@ -7,13 +7,10 @@ Sample project for Imposter with Jest
 - [Imposter CLI](https://github.com/gatehill/imposter-cli)
 
 **Important:** Ensure you have built the parent module, on which this sample depends:
-```
-cd ..
-npm install
-npm run build
-```
 
-This creates a `dist` directory containing the `@imposter-js/imposter` module.
+    npm run build-parent
+
+This creates a `tmp` directory containing the `@imposter-js/imposter` module.
 
 ## Instructions
 

@@ -1,6 +1,6 @@
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
 import {OrderService} from "./orders";
-import {mocks} from "imposter/src";
+import {mocks} from "@imposter-js/imposter";
 
 /**
  * Tests for order-service mock.
@@ -9,7 +9,7 @@ import {mocks} from "imposter/src";
  * The directory also contains Imposter configuration files, as well as dynamic scripts to synthesise
  * an order confirmation.
  *
- * Important: In your own project, change the import to:
+ * In your own project import with either:
  *   import {mocks} from "@imposter-js/imposter";
  * or:
  *   const {mocks} = require("@imposter-js/imposter");

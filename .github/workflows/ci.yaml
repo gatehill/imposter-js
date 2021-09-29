@@ -12,19 +12,26 @@ jobs:
         with:
           node-version: '12.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: curl -L https://raw.githubusercontent.com/gatehill/imposter-cli/main/install/install_imposter.sh | bash -
+
+      - name: Install Imposter CLI
+        run: curl -L https://raw.githubusercontent.com/gatehill/imposter-cli/main/install/install_imposter.sh | bash -
+
       - name: Install core module dependencies
         run: npm install
       - name: Test core module
         run: npm test
+      - name: Build core module
+        run: npm run build
+
       - name: Install sample project dependencies
         run: npm install
         working-directory: sample
       - name: Test sample project
         run: npm test
         working-directory: sample
+
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
-        run: npm run build && npm publish --access public
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}

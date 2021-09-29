@@ -1,6 +1,6 @@
 import {PetNameService} from "./petnames";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
-import {mocks} from "imposter/src";
+import {mocks} from "@imposter-js/imposter";
 
 /**
  * Tests for pet-name-service mock
@@ -8,7 +8,7 @@ import {mocks} from "imposter/src";
  * A bare directory under `apis/pet-name-api` containing only an OpenAPI file,
  * with the Imposter configuration generated when the mock starts.
  *
- * Important: In your own project, change the import to:
+ * In your own project import with either:
  *   import {mocks} from "@imposter-js/imposter";
  * or:
  *   const {mocks} = require("@imposter-js/imposter");

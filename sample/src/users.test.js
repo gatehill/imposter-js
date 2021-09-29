@@ -1,6 +1,6 @@
 import {UserService} from "./users";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
-import {mocks} from "imposter/src";
+import {mocks} from "@imposter-js/imposter";
 
 /**
  * Tests for user-service mock
@@ -8,7 +8,7 @@ import {mocks} from "imposter/src";
  * A mock defined entirely within the test - no OpenAPI specification,
  * no Imposter configuration - all configured within the Jest test.
  *
- * Important: In your own project, change the import to:
+ * In your own project import with either:
  *   import {mocks} from "@imposter-js/imposter";
  * or:
  *   const {mocks} = require("@imposter-js/imposter");

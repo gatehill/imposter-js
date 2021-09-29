@@ -1,6 +1,6 @@
 import {StockService} from "./stock";
 import {afterAll, beforeAll, expect, it, jest} from '@jest/globals';
-import {mocks} from "imposter/src";
+import {mocks} from "@imposter-js/imposter";
 
 /**
  * Tests for stock-service mock
@@ -8,7 +8,7 @@ import {mocks} from "imposter/src";
  * Defined using OpenAPI specifications under the `apis/stock-api` directory.
  * The directory also contains Imposter configuration files, but no dynamic scripts.
  *
- * Important: In your own project, change the import to:
+ * In your own project import with either:
  *   import {mocks} from "@imposter-js/imposter";
  * or:
  *   const {mocks} = require("@imposter-js/imposter");

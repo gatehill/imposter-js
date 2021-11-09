@@ -8,7 +8,7 @@ Sample project for Imposter with Jest
 
 **Important:** Ensure you have built the parent module, on which this sample depends:
 
-    npm run build-parent
+    npm run prep-sample
 
 This creates a `tmp` directory containing the `@imposter-js/imposter` module.
 

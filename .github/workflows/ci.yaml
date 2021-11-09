@@ -25,7 +25,7 @@ jobs:
 
       - name: Install sample project dependencies
         run: |
-          npm run build-parent
+          npm run prep-sample
           npm install
         working-directory: sample
       - name: Test sample project

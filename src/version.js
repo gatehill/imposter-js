@@ -116,12 +116,31 @@ class VersionReader {
      */
     runIfVersionAtLeast = (major, minor, revision, block, orElseBlock = undefined) => {
         const cliVersion = this.determineCliVersion();
-        if (cliVersion.major >= major && cliVersion.minor >= minor && cliVersion.revision >= revision) {
+        if (this.versionAtLeast({major, minor, revision}, cliVersion)) {
             return block();
         } else if (orElseBlock) {
             return orElseBlock();
         }
         return undefined;
+    }
+
+    /**
+     * Determines if the `test` SemVer version is equal to or greater than `required`.
+     * @param required {{major: number, minor: number, revision: number}}
+     * @param test {{major: number, minor: number, revision: number}}
+     * @returns {boolean}
+     */
+    versionAtLeast = (required, test) => {
+        if (test.major > required.major) {
+            return true;
+        } else if (test.major === required.major) {
+            if (test.minor > required.minor) {
+                return true;
+            } else if (test.minor === required.minor) {
+                return (test.revision >= required.revision);
+            }
+        }
+        return false;
     }
 }
 

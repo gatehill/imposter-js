@@ -26,4 +26,21 @@ describe('version reader', () => {
         expect(execIf0_6).toEqual(true);
         expect(execIf99_0).toEqual(false);
     });
+
+    it('runs version specific logic without else', () => {
+        const execIf99_0 = versionReader.runIfVersionAtLeast(99, 0, 0, () => {
+            return true;
+        });
+        expect(execIf99_0).toBeUndefined();
+    });
+
+    it('runs version specific logic with greater major', () => {
+        // exercise the path where major version is greater
+        const execIf0_0 = versionReader.runIfVersionAtLeast(-1, 0, 0, () => {
+            return true;
+        }, () => {
+            return false;
+        });
+        expect(execIf0_0).toBeTruthy();
+    });
 });

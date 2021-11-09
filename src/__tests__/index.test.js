@@ -25,7 +25,7 @@ describe('end to end tests', () => {
     it('starts a mock from a bare OpenAPI spec', async () => {
         const specFile = `${__dirname}/test_data/bare_openapi/pet-name-api.yaml`;
         const mock = mocks.builder()
-            .withPort(8081)
+            .withPort(8086)
             .withOpenApiSpec(specFile)
             .withRequestValidation()
             .build();

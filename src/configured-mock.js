@@ -207,12 +207,21 @@ export class Utils {
         }
     }
 
+    /**
+     * Promisified sleep.
+     * @param ms
+     * @returns {Promise<void>}
+     */
     sleep = (ms) => {
         return new Promise((resolve) => {
             setTimeout(resolve, ms);
         });
     }
 
+    /**
+     * Find a free port on which to listen.
+     * @returns {Promise<number>}
+     */
     assignFreePort = async () => {
         return new Promise((resolve, reject) => {
             try {

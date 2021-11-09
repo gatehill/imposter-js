@@ -12,7 +12,7 @@ describe('mock builder', () => {
         const mockManager = new MockManager();
 
         const builder = new MockBuilder(mockManager)
-            .withPort(8081)
+            .withPort(8084)
             .withOpenApiSpec(specFile)
             .withRequestValidation();
 
@@ -50,7 +50,7 @@ describe('mock builder', () => {
         const mockManager = new MockManager();
 
         const builder = new MockBuilder(mockManager)
-            .withPort(8082)
+            .withPort(8085)
             .withConfig(config);
 
         // build should invoke prepare on the manager

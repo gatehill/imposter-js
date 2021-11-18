@@ -61,7 +61,7 @@ class VersionReader {
      * Determines the version of the CLI subcomponent.
      *
      * @param componentName {RegExp}
-     * @returns {{major: number, minor: number, revision: number}}
+     * @returns {{major: number, minor: number, revision: number, cli: string}}
      */
     determineVersion = (componentName) => {
         if (!this._initialised) {
@@ -85,6 +85,7 @@ class VersionReader {
                 major: Number(version[0]),
                 minor: Number(version[1]),
                 revision: Number(version[2]),
+                cli: 'imposter-cli',
             };
 
         } catch (e) {
@@ -95,11 +96,25 @@ class VersionReader {
     /**
      * Determine the version of the CLI.
      *
-     * @returns {{major: number, minor: number, revision: number}}
+     * @returns {{major: number, minor: number, revision: number, cli: string}}
      */
     determineCliVersion = () => {
         if (!this._cliVersion) {
-            this._cliVersion = this.determineVersion(/imposter-cli/);
+            try {
+                this._cliVersion = this.determineVersion(/imposter-cli/);
+            } catch(e) {
+                if (e.message.contains('Error parsing version') && this._versionOutput.startsWith('Version: ')) {
+                    const version = this._versionOutput.split('Version: ')[0];
+                    this._cliVersion = {
+                        major: Number(version[0]),
+                        minor: Number(version[1]),
+                        revision: Number(version[2]),
+                        cli: 'imposter',
+                    }
+                } else {
+                    throw e;
+                }
+            }
         }
         return this._cliVersion;
     }

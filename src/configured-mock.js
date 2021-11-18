@@ -67,11 +67,26 @@ export class ConfiguredMock {
 
         this.proc = await new Promise(async (resolve, reject) => {
             try {
-                const args = [
-                    'up', this.configDir,
-                    `--port=${this.port}`,
-                    '--auto-restart=false',
-                ];
+                var args;
+
+                switch (this.utils.getCli()) {
+                    case 'imposter-cli':
+                        args = [
+                            'up', this.configDir,
+                            `--port=${this.port}`,
+                            '--auto-restart=false',
+                        ];
+                        break;
+                    case 'imposter':
+                        args = [
+                            `--configDir=${this.configDir}`,
+                            `--listenPort=${this.port}`,
+                        ];
+                        break;
+                    default:
+                        throw new Error('Failed to find an appropriate imposter cli to run');
+                }
+
                 if (localConfigFile) {
                     if (this.logVerbose) {
                         nodeConsole.debug(`Using project configuration: ${localConfigFile}`);
@@ -178,6 +193,10 @@ export class ConfiguredMock {
 }
 
 export class Utils {
+    getCli = () => {
+        return versionReader.determineCliVersion().cli;
+    }
+
     buildDebugAdvice = (logToFile, logVerbose, logFilePath) => {
         let advice = '';
         if (logToFile) {

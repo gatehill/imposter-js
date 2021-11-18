@@ -21,15 +21,23 @@ class VersionReader {
 
     initIfRequired = async () => {
         if (!this._initialised) {
-            this._versionOutput = await this.invokeVersionCommand();
+            try {
+                this._versionOutput = await this.invokeVersionCommand();
+            } catch(e) {
+                if (e.message.startsWith('Error determining version')) {
+                    this._versionOutput = await this.invokeVersionCommand('--version');
+                } else {
+                    throw e;
+                }
+            }
             this._initialised = true;
         }
     }
 
-    invokeVersionCommand = () => {
+    invokeVersionCommand = (arg = 'version') => {
         return new Promise((resolve, reject) => {
             try {
-                const proc = spawn('imposter', ['version']);
+                const proc = spawn('imposter', [arg]);
                 let output = '';
 
                 proc.on('error', err => {
@@ -103,7 +111,7 @@ class VersionReader {
             try {
                 this._cliVersion = this.determineVersion(/imposter-cli/);
             } catch(e) {
-                if (e.message.contains('Error parsing version') && this._versionOutput.startsWith('Version: ')) {
+                if (e.message.startsWith('Error parsing version') && this._versionOutput.startsWith('Version: ')) {
                     const version = this._versionOutput.split('Version: ')[0];
                     this._cliVersion = {
                         major: Number(version[0]),

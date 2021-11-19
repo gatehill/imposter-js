@@ -9,7 +9,7 @@ describe('version reader', () => {
     it('can determine the CLI version', () => {
         const version = versionReader.determineCliVersion();
         console.debug(`CLI version: ${JSON.stringify(version)}`);
-        expect(version.major).toEqual(0);
+        expect(version.major).not.toBeNull();
     });
 
     it('runs version specific logic', () => {

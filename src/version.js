@@ -112,7 +112,7 @@ class VersionReader {
                 this._cliVersion = this.determineVersion(/imposter-cli/);
             } catch(e) {
                 if (e.message.startsWith('Error parsing version') && this._versionOutput.startsWith('Version: ')) {
-                    const version = this._versionOutput.split('Version: ')[0];
+                    const version = this._versionOutput.split('Version: ')[1].trim().split('.');
                     this._cliVersion = {
                         major: Number(version[0]),
                         minor: Number(version[1]),

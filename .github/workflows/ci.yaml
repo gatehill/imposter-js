@@ -10,22 +10,11 @@ jobs:
         with:
           node-version: '12.x'
           registry-url: 'https://registry.npmjs.org'
-          
+
       - name: Install core module dependencies
         run: npm install
       - name: Test core module
         run: npm test
-      - name: Build core module
-        run: npm run build
-
-      - name: Install sample project dependencies
-        run: |
-          npm run prep-sample
-          npm install
-        working-directory: sample
-      - name: Test sample project
-        run: npm test
-        working-directory: sample
   build:
     needs: build-container
     runs-on: ubuntu-latest

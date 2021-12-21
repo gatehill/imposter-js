@@ -213,6 +213,29 @@ export class MockBuilder {
     }
 
     /**
+     * Set environment variables passed to the mock engine.
+     *
+     * **Note** only those matching the following names are passed:
+     * - IMPOSTER_*
+     * - JAVA_OPTS
+     *
+     * For example:
+     * ```
+     * withEnv({
+     *     "IMPOSTER_LOG_SUMMARY": "true",
+     *     "IMPOSTER_SOME_VAR": "123",
+     * })
+     * ```
+     *
+     * @param env {Record<string, string>}
+     * @return {MockBuilder}
+     */
+    withEnv = (env) => {
+        this.env = env;
+        return this;
+    }
+
+    /**
      * @param plugin {string}
      * @return {MockBuilder}
      */
@@ -285,7 +308,7 @@ export class MockBuilder {
         const mockConfigPath = path.join(this.configDir, 'imposter-config.json');
         fs.writeFileSync(mockConfigPath, JSON.stringify(this.config, null, '  '));
         nodeConsole.debug(`Wrote mock config to: ${mockConfigPath}`);
-        return this.mockManager.prepare(this.configDir, this.port);
+        return this.mockManager.prepare(this.configDir, this.port, this.env);
     }
 
     /**

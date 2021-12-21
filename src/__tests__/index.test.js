@@ -98,6 +98,36 @@ describe('end to end tests', () => {
         expect(response.data).toEqual('Hello world');
     });
 
+    it('returns an environment variable', async () => {
+        const config = {
+            plugin: 'rest',
+            resources: [
+                {
+                    path: "/env",
+                    method: 'GET',
+                    response: {
+                        statusCode: 200,
+                        staticData: '${env.IMPOSTER_TEST_VAR}',
+                        template: true
+                    }
+                }
+            ]
+        };
+
+        const mock = mocks.builder()
+            .withConfig(config)
+            .withEnv({
+                "IMPOSTER_TEST_VAR": "foo",
+            })
+            .build();
+
+        await mock.start();
+
+        const response = await axios.get(`${mock.baseUrl()}/env`);
+        expect(response.status).toEqual(200);
+        expect(response.data).toEqual('foo');
+    });
+
     it('returns deprecated manager', async () => {
         const legacyManager = require('../index').default();
         expect(legacyManager).toBeInstanceOf(MockManager);

@@ -29,7 +29,13 @@ class VersionReader {
     invokeVersionCommand = () => {
         return new Promise((resolve, reject) => {
             try {
-                const proc = spawn('imposter', ['version']);
+                const options = {
+                    env: {
+                        ...process.env,
+                        "LOG_LEVEL": "INFO"
+                    }
+                };
+                const proc = spawn('imposter', ['version'], options);
                 let output = '';
 
                 proc.on('error', err => {

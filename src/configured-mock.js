@@ -19,6 +19,11 @@ export class ConfiguredMock {
      */
     port;
 
+    /**
+     * @type {Record<string, string>}
+     */
+    env;
+
     logVerbose = false;
     logToFile = true;
     logFileStream;
@@ -37,10 +42,12 @@ export class ConfiguredMock {
     /**
      * @param configDir {string}
      * @param port {number|null}
+     * @param env {Record<string, string>}
      */
-    constructor(configDir, port = null) {
+    constructor(configDir, port = null, env = {}) {
         this.configDir = configDir;
         this.port = port;
+        this.env = env;
         this.utils = new Utils();
     }
 
@@ -78,7 +85,14 @@ export class ConfiguredMock {
                     }
                     args.push(`--config=${localConfigFile}`);
                 }
-                const proc = spawn('imposter', args);
+                this.validateEnv(this.env);
+                const options = {
+                    env: {
+                        ...process.env,
+                        ...this.env,
+                    },
+                }
+                const proc = spawn('imposter', args, options);
                 await this.listenForEvents(proc, reject);
 
                 await this.waitUntilReady(proc);
@@ -90,6 +104,14 @@ export class ConfiguredMock {
         });
 
         return this;
+    }
+
+    validateEnv(env) {
+        for (const key in env) {
+            if (!key.match(/IMPOSTER_.+/) || key !== "JAVA_OPTS") {
+                nodeConsole.warn(`Environment variable ${key} does not match IMPOSTER_* or JAVA_OPTS - this may be ignored by the mock engine`);
+            }
+        }
     }
 
     listenForEvents = async (proc, reject) => {

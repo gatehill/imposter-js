@@ -1,6 +1,6 @@
 # Imposter Mock Engine [![CI](https://github.com/gatehill/imposter-js/actions/workflows/ci.yaml/badge.svg)](https://github.com/gatehill/imposter-js/actions/workflows/ci.yaml)
 
-Bindings for using the [Imposter mock engine](https://github.com/outofcoffee/imposter/) in JavaScript/Node.js.
+Bindings for using the [Imposter mock engine](https://www.imposter.sh) in JavaScript/Node.js.
 
 Embed live HTTP mocks within your tests, based on OpenAPI specification files or plain REST APIs.
 
@@ -140,8 +140,8 @@ console.log(response.data);
 
 ## Documentation
 
-- [Mock engine configuration](https://github.com/gatehill/imposter-js/blob/main/docs/config.md)
-- [Imposter user documentation](https://outofcoffee.github.io/imposter)
+- [Imposter user documentation](https://docs.imposter.sh) - this is the main documentation
+- [Mock engine configuration](https://github.com/gatehill/imposter-js/blob/main/docs/config.md) - configuration for different engine types
 
 ## Features
 
@@ -159,5 +159,5 @@ Send dynamic responses:
 
 This project is only possible thanks to the following:
 
-- [Imposter](https://github.com/outofcoffee/imposter)
+- [Imposter](https://www.imposter.sh)
 - [Jest](https://jestjs.io/)

@@ -108,8 +108,8 @@ export class ConfiguredMock {
 
     validateEnv(env) {
         for (const key in env) {
-            if (!key.match(/IMPOSTER_.+/) || key !== "JAVA_OPTS") {
-                nodeConsole.warn(`Environment variable ${key} does not match IMPOSTER_* or JAVA_OPTS - this may be ignored by the mock engine`);
+            if (!key.match(/IMPOSTER_.+/) || key !== "JAVA_TOOL_OPTIONS") {
+                nodeConsole.warn(`Environment variable ${key} does not match IMPOSTER_* or JAVA_TOOL_OPTIONS - this may be ignored by the mock engine`);
             }
         }
     }

@@ -217,7 +217,7 @@ export class MockBuilder {
      *
      * **Note** only those matching the following names are passed:
      * - IMPOSTER_*
-     * - JAVA_OPTS
+     * - JAVA_TOOL_OPTIONS
      *
      * For example:
      * ```

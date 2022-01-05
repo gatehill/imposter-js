@@ -40,3 +40,15 @@ Example 2:
 ```
 
 > In this example, we use the JVM engine and version 1.22.0 of Imposter.
+
+## SELinux and Docker user permissions
+
+By default, the Imposter container runs with a lower permissioned user, with uid/gid of 2048.
+
+If SELinux is enabled, this user may not be able to read configuration written by this library.
+
+To fix this, you can change the container user, using:
+
+    export IMPOSTER_DOCKER_CONTAINERUSER="$(id -u)"
+
+This aligns the container user uid to that of your local environment.

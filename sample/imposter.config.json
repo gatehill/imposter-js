@@ -1,4 +1,4 @@
 {
   "engine": "docker",
-  "version": "1.23.0"
+  "version": "2.4.12"
 }

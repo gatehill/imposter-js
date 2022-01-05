@@ -24,7 +24,7 @@ Example 1:
 ```json
 {
   "engine": "docker",
-  "version": "1.23.0"
+  "version": "2.4.12"
 }
 ```
 
@@ -35,7 +35,7 @@ Example 2:
 ```json
 {
   "engine": "jvm",
-  "version": "1.22.0"
+  "version": "2.4.12"
 }
 ```
 

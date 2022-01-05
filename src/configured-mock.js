@@ -92,6 +92,10 @@ export class ConfiguredMock {
                         ...this.env,
                     },
                 }
+                if (this.logVerbose) {
+                    nodeConsole.debug(`Arguments: ${JSON.stringify(args)}`);
+                    nodeConsole.debug(`Environment: ${JSON.stringify(options.env)}`);
+                }
                 const proc = spawn('imposter', args, options);
                 await this.listenForEvents(proc, reject);
 

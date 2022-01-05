@@ -21,7 +21,7 @@ jobs:
       - name: Pull test dependencies
         run: |
           docker pull outofcoffee/imposter:latest
-          docker pull outofcoffee/imposter:2.4.12
+          docker pull outofcoffee/imposter:2.4.13
       - name: Test core module
         run: npm test
       - name: Build core module

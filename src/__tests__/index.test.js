@@ -3,7 +3,7 @@ import {mocks} from "../index";
 import axios from "axios";
 import {MockManager} from "../mock-manager";
 
-jest.setTimeout(30000);
+mocks.verbose();
 
 describe('end to end tests', () => {
     afterAll(async () => {
@@ -28,7 +28,7 @@ describe('end to end tests', () => {
             .withPort(8086)
             .withOpenApiSpec(specFile)
             .withRequestValidation()
-            .build();
+            .build({logVerbose: true});
 
         await mock.start();
 
@@ -50,7 +50,7 @@ describe('end to end tests', () => {
         resource.captures().fromPath('userName');
         resource.responds(201).withTemplateData('Hello ${request.userName}');
 
-        const mock = builder.build();
+        const mock = builder.build({logVerbose: true});
         await mock.start();
 
         const response = await axios.post(`${mock.baseUrl()}/users/alice`);
@@ -89,7 +89,7 @@ describe('end to end tests', () => {
         const mock = mocks.builder()
             .withPort(8082)
             .withConfig(config)
-            .build();
+            .build({logVerbose: true});
 
         await mock.start();
 
@@ -119,7 +119,7 @@ describe('end to end tests', () => {
             .withEnv({
                 "IMPOSTER_TEST_VAR": "foo",
             })
-            .build();
+            .build({logVerbose: true});
 
         await mock.start();
 

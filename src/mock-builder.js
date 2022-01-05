@@ -303,11 +303,16 @@ export class MockBuilder {
 
     /**
      * @return {ConfiguredMock}
+     * @param options {{logVerbose:boolean}}
      */
-    build = () => {
+    build = (options = {}) => {
         const mockConfigPath = path.join(this.configDir, 'imposter-config.json');
-        fs.writeFileSync(mockConfigPath, JSON.stringify(this.config, null, '  '));
-        nodeConsole.debug(`Wrote mock config to: ${mockConfigPath}`);
+        const mockConfig = JSON.stringify(this.config, null, '  ');
+        fs.writeFileSync(mockConfigPath, mockConfig);
+
+        const logContext = (options.logVerbose ? `config=${mockConfig}` : '');
+        nodeConsole.debug(`Wrote mock config to: ${mockConfigPath}`, logContext);
+
         return this.mockManager.prepare(this.configDir, this.port, this.env);
     }
 

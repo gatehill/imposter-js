@@ -3,6 +3,7 @@ module.exports = {
     collectCoverage: true,
     coverageDirectory: "coverage",
     coverageProvider: "v8",
+    testTimeout: 60000,
 
     testEnvironment: "node",
     testMatch: [

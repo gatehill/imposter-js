@@ -29,7 +29,7 @@ it('writes chunk to console', async () => {
         consoleOutput += chunk;
     };
 
-    utils.writeChunk('foo', true, false, fakeConsole, undefined);
+    utils.writeChunk('foo', true, false, fakeConsole, null);
 
     expect(consoleOutput).toEqual('foo');
 });

@@ -201,7 +201,7 @@ export class Utils {
                 if (logFileWriter) {
                     logFileWriter.write(chunk);
                 } else {
-                    nodeConsole.warn('Log file stream not set');
+                    nodeConsole.warn(`No active log file stream - skipped writing mock output:\n${chunk}`);
                 }
             } catch (ignored) {
             }

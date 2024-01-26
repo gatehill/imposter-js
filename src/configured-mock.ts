@@ -14,7 +14,7 @@ export class ConfiguredMock {
     env: Record<string, string>;
     logVerbose = false;
     logToFile = true;
-    logFileStream?: fs.WriteStream;
+    logFileStream: fs.WriteStream | null = null;
     proc?: ChildProcess;
     logFilePath?: string;
 
@@ -151,6 +151,7 @@ export class ConfiguredMock {
         if (this.logFileStream) {
             try {
                 this.logFileStream.close();
+                this.logFileStream = null;
             } catch (ignored) {
             }
         }
@@ -188,7 +189,7 @@ export class Utils {
         return advice;
     }
 
-    writeChunk = (chunk: any, logVerbose: boolean, logToFile: boolean, consoleFn: (msg: string) => void, logFileWriter?: LogFileWriter) => {
+    writeChunk = (chunk: any, logVerbose: boolean, logToFile: boolean, consoleFn: (msg: string) => void, logFileWriter: LogFileWriter | null) => {
         if (!chunk) {
             return;
         }
@@ -197,10 +198,11 @@ export class Utils {
         }
         if (logToFile) {
             try {
-                if (!logFileWriter) {
-                    throw new Error('Log file stream not set');
+                if (logFileWriter) {
+                    logFileWriter.write(chunk);
+                } else {
+                    nodeConsole.warn('Log file stream not set');
                 }
-                logFileWriter.write(chunk);
             } catch (ignored) {
             }
         }

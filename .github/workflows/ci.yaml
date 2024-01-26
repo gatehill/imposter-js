@@ -20,7 +20,7 @@ jobs:
         run: npm install
       - name: Pull test dependencies
         run: |
-          imposter engine pull --version 2.4.13
+          imposter engine pull --version 3.33.4
           imposter engine pull --version latest
       - name: Test core module
         run: |

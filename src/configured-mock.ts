@@ -126,7 +126,7 @@ export class ConfiguredMock {
                 throw new Error(`Failed to start mock engine on port ${this.port}. Exit code: ${proc.exitCode}${advice}`);
             }
             try {
-                const response = await httpGet(`http://localhost:${this.port}/system/status`);
+                const response = await httpGet(`http://127.0.0.1:${this.port}/system/status`);
                 if (response.status === 200) {
                     nodeConsole.debug('Mock server is up!');
                     break
@@ -165,7 +165,7 @@ export class ConfiguredMock {
         if (!this.port) {
             throw new Error('Cannot get base URL before starting mock unless port explicitly set');
         }
-        return `http://localhost:${this.port}`;
+        return `http://127.0.0.1:${this.port}`;
     }
 }
 

@@ -1,4 +1,4 @@
-import {afterAll, expect, it, jest} from '@jest/globals';
+import {afterAll, describe, expect, it} from '@jest/globals';
 import {mocks} from "../index";
 import axios from "axios";
 import {MockManager} from "../mock-manager";

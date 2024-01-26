@@ -1,4 +1,4 @@
-import {beforeAll, expect, it} from '@jest/globals';
+import {beforeAll, describe, expect, it} from '@jest/globals';
 import {versionReader} from "../version";
 
 describe('version reader', () => {

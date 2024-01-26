@@ -1,15 +1,16 @@
-import {expect, it} from '@jest/globals';
+import {describe, expect, it} from '@jest/globals';
 import {MockBuilder} from "../mock-builder";
-import MockManager from "./__mocks__/mock-manager";
+import FakeMockManager from "./__mocks__/mock-manager";
 import fs from "fs";
 import path from "path";
+import {MockManager} from "../mock-manager";
 
 describe('mock builder', () => {
     it('builds an openapi mock', async () => {
         const specFile = `${__dirname}/test_data/bare_openapi/pet-name-api.yaml`;
 
         // manual mock
-        const mockManager = new MockManager();
+        const mockManager = new FakeMockManager() as MockManager;
 
         const builder = new MockBuilder(mockManager)
             .withPort(8084)
@@ -19,8 +20,8 @@ describe('mock builder', () => {
         expect(builder.config.plugin).toEqual('openapi');
         expect(builder.config.specFile).toEqual('pet-name-api.yaml');
         expect(builder.config.validation).toBeTruthy();
-        expect(builder.config.validation.request).toBe(true);
-        expect(builder.config.validation.levels).toBeTruthy();
+        expect(builder.config.validation?.request).toBe(true);
+        expect(builder.config.validation?.levels).toBeTruthy();
 
         // build should invoke prepare on the manager
         builder.build();
@@ -47,7 +48,7 @@ describe('mock builder', () => {
         };
 
         // manual mock
-        const mockManager = new MockManager();
+        const mockManager = new FakeMockManager() as MockManager;
 
         const builder = new MockBuilder(mockManager)
             .withPort(8085)
@@ -63,7 +64,7 @@ describe('mock builder', () => {
     });
 });
 
-const readConfigFile = async function (builder) {
+const readConfigFile = async function (builder: MockBuilder) {
     // config file should be written
     const configFilePath = path.join(builder.configDir, 'imposter-config.json');
     expect(fs.existsSync(configFilePath)).toBe(true);

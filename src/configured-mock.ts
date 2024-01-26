@@ -1,7 +1,7 @@
 import {versionReader} from "./version";
 import {fileUtils} from "./fileutils";
 import {nodeConsole} from "./console";
-import {spawn} from "child_process";
+import {ChildProcess, ChildProcessWithoutNullStreams, spawn} from "child_process";
 import path from "path";
 import fs from "fs";
 import os from "os";
@@ -9,52 +9,25 @@ import net from "net";
 import {httpGet} from "./healthcheck";
 
 export class ConfiguredMock {
-    /**
-     * @type {string}
-     */
-    configDir;
-
-    /**
-     * @type {number|null}
-     */
-    port;
-
-    /**
-     * @type {Record<string, string>}
-     */
-    env;
-
+    configDir: string;
+    port: number | null;
+    env: Record<string, string>;
     logVerbose = false;
     logToFile = true;
-    logFileStream;
-    proc;
+    logFileStream?: fs.WriteStream;
+    proc?: ChildProcess;
+    logFilePath?: string;
 
-    /**
-     * @type {string}
-     */
-    logFilePath;
+    private utils: Utils;
 
-    /**
-     * @type {Utils}
-     */
-    utils;
-
-    /**
-     * @param configDir {string}
-     * @param port {number|null}
-     * @param env {Record<string, string>}
-     */
-    constructor(configDir, port = null, env = {}) {
+    constructor(configDir: string, port: number | null = null, env: Record<string, string> = {}) {
         this.configDir = configDir;
         this.port = port;
         this.env = env;
         this.utils = new Utils();
     }
 
-    /**
-     * @return {Promise<ConfiguredMock>}
-     */
-    start = async () => {
+    start = async (): Promise<ConfiguredMock> => {
         if (this.proc) {
             throw new Error(`Mock on port ${this.port} already started`);
         }
@@ -110,7 +83,7 @@ export class ConfiguredMock {
         return this;
     }
 
-    validateEnv(env) {
+    validateEnv(env: Record<string, string>) {
         for (const key in env) {
             if (!key.match(/IMPOSTER_.+/) && key !== "JAVA_TOOL_OPTIONS") {
                 nodeConsole.warn(`Environment variable ${key} does not match IMPOSTER_* or JAVA_TOOL_OPTIONS - this may be ignored by the mock engine`);
@@ -118,7 +91,7 @@ export class ConfiguredMock {
         }
     }
 
-    listenForEvents = async (proc, reject) => {
+    listenForEvents = async (proc: ChildProcessWithoutNullStreams, reject: (reason: any) => void) => {
         proc.on('error', err => {
             reject(new Error(`Error running 'imposter' command. Is Imposter CLI installed?\n${err}`));
 
@@ -145,7 +118,7 @@ export class ConfiguredMock {
         });
     }
 
-    waitUntilReady = async (proc) => {
+    waitUntilReady = async (proc: ChildProcess) => {
         nodeConsole.debug(`Waiting for mock server to come up on port ${this.port}`);
         let ready = false;
         while (!ready) {
@@ -184,18 +157,12 @@ export class ConfiguredMock {
         }
     }
 
-    /**
-     * @return {ConfiguredMock}
-     */
-    verbose = () => {
+    verbose = (): ConfiguredMock => {
         this.logVerbose = true;
         return this;
     }
 
-    /**
-     * @return {string}
-     */
-    baseUrl = () => {
+    baseUrl = (): string => {
         if (!this.port) {
             throw new Error('Cannot get base URL before starting mock unless port explicitly set');
         }
@@ -203,8 +170,12 @@ export class ConfiguredMock {
     }
 }
 
+interface LogFileWriter {
+    write(chunk: string): void;
+}
+
 export class Utils {
-    buildDebugAdvice = (logToFile, logVerbose, logFilePath) => {
+    buildDebugAdvice = (logToFile: boolean, logVerbose: boolean, logFilePath?: string) => {
         let advice = '';
         if (logToFile) {
             advice += `\nSee log file: ${logFilePath}`;
@@ -218,7 +189,7 @@ export class Utils {
         return advice;
     }
 
-    writeChunk = (chunk, logVerbose, logToFile, consoleFn, logFileStream) => {
+    writeChunk = (chunk: any, logVerbose: boolean, logToFile: boolean, consoleFn: (msg: string) => void, logFileWriter?: LogFileWriter) => {
         if (!chunk) {
             return;
         }
@@ -227,7 +198,10 @@ export class Utils {
         }
         if (logToFile) {
             try {
-                logFileStream.write(chunk);
+                if (!logFileWriter) {
+                    throw new Error('Log file stream not set');
+                }
+                logFileWriter.write(chunk);
             } catch (ignored) {
             }
         }
@@ -235,10 +209,8 @@ export class Utils {
 
     /**
      * Promisified sleep.
-     * @param ms
-     * @returns {Promise<void>}
      */
-    sleep = (ms) => {
+    sleep = (ms: number): Promise<void> => {
         return new Promise((resolve) => {
             setTimeout(resolve, ms);
         });
@@ -246,14 +218,13 @@ export class Utils {
 
     /**
      * Find a free port on which to listen.
-     * @returns {Promise<number>}
      */
-    assignFreePort = async () => {
+    assignFreePort = async (): Promise<number> => {
         return new Promise((resolve, reject) => {
             try {
                 const srv = net.createServer();
                 srv.listen(0, () => {
-                    const port = srv.address().port;
+                    const port = (srv.address() as net.AddressInfo).port;
                     srv.close(() => {
                         resolve(port);
                     });

@@ -1,10 +1,6 @@
 import http from 'http';
 
-/**
- * @param url {string}
- * @returns {Promise<{status: number, body: string}>}
- */
-export function httpGet(url) {
+export function httpGet(url: string): Promise<{ status: number; body: string; }> {
     return new Promise((resolve, reject) => {
         let options = {
             timeout: 1000,
@@ -17,7 +13,7 @@ export function httpGet(url) {
             response.on('error', reject);
             response.on('end', () => {
                 resolve({
-                    status: response.statusCode,
+                    status: response.statusCode ?? 0,
                     body: body,
                 });
             });

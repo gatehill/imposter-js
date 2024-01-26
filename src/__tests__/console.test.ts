@@ -1,4 +1,4 @@
-import {expect, it} from '@jest/globals';
+import {describe, expect, it} from '@jest/globals';
 import {nodeConsole} from "../console";
 
 describe('console', () => {

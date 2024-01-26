@@ -25,11 +25,11 @@ Run 'imposter doctor' to diagnose engine issues.`
 
 it('writes chunk to console', async () => {
     let consoleOutput = '';
-    const fakeConsole = (chunk) => {
+    const fakeConsole = (chunk: string) => {
         consoleOutput += chunk;
     };
 
-    utils.writeChunk('foo', true, false, fakeConsole, null);
+    utils.writeChunk('foo', true, false, fakeConsole, undefined);
 
     expect(consoleOutput).toEqual('foo');
 });
@@ -37,12 +37,12 @@ it('writes chunk to console', async () => {
 it('writes chunk to stream', async () => {
     let consoleOutput = '';
     const fakeStream = {
-        write(chunk) {
+        write(chunk: string) {
             consoleOutput += chunk;
         }
     };
 
-    utils.writeChunk('foo', false, true, null, fakeStream);
+    utils.writeChunk('foo', false, true, console.debug, fakeStream);
 
     expect(consoleOutput).toEqual('foo');
 });
@@ -71,10 +71,10 @@ it('assigns free port', async () => {
 
 it('sleeps', async () => {
     const expectedDurationMs = 10;
-    const start = new Date().getMilliseconds();
+    const start = new Date().getTime();
 
     await utils.sleep(expectedDurationMs);
 
-    const now = new Date().getMilliseconds();
+    const now = new Date().getTime();
     expect(now).toBeGreaterThanOrEqual(start + expectedDurationMs);
 });

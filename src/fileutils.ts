@@ -3,17 +3,8 @@ import fs, {constants} from "fs";
 import {versionReader} from "./version";
 
 class FileUtils {
-    /**
-     * @type {boolean}
-     * @private
-     */
-    _initialised = false;
-
-    /**
-     * @type {string}
-     * @private
-     */
-    _pkgJsonDir;
+    private _initialised: boolean = false;
+    private _pkgJsonDir?: string;
 
     initIfRequired = async () => {
         await versionReader.initIfRequired();
@@ -35,16 +26,13 @@ class FileUtils {
     /**
      * Searches the current working directory and the module's project directory
      * for a CLI configuration file.
-     *
-     * @param searchPaths {string[]}
-     * @returns {string|undefined|null}
      */
-    discoverLocalConfig = (searchPaths = null) => {
+    discoverLocalConfig = (searchPaths: string[] | null = null): string | null => {
         return versionReader.runIfVersionAtLeast(0, 6, 0, () => {
             const sp = searchPaths || [
                 this.getPkgJsonDir(),
                 process.cwd(),
-            ];
+            ] as string[];
             const configs = sp
                 .map(searchPath => path.join(searchPath, 'imposter.config.json'))
                 .filter(fs.existsSync);
@@ -55,14 +43,12 @@ class FileUtils {
 
     /**
      * Determine the path to the module's project directory.
-     *
-     * @returns {string}
      */
-    getPkgJsonDir = () => {
+    getPkgJsonDir = (): string => {
         if (!this._initialised) {
             throw new Error('initIfRequired() not called');
         }
-        return this._pkgJsonDir;
+        return this._pkgJsonDir as string;
     }
 }
 

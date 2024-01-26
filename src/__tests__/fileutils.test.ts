@@ -1,4 +1,4 @@
-import {beforeAll, expect, it} from '@jest/globals';
+import {beforeAll, describe, expect, it} from '@jest/globals';
 import {fileUtils} from "../fileutils";
 import path from "path";
 import fs from "fs";
@@ -18,7 +18,7 @@ describe('file utilities', () => {
         expect(localConfig).toContain('/test_data/cli_config/imposter.config.json');
 
         // check file exists
-        expect(fs.existsSync(localConfig)).toBe(true);
+        expect(fs.existsSync(localConfig!!)).toBe(true);
     });
 
     it('returns null if no local config found', () => {

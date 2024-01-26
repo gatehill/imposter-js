@@ -1,23 +1,11 @@
 import {spawn} from "child_process";
 
+type SemanticVersion = { major: number; minor: number; revision: number; };
+
 class VersionReader {
-    /**
-     * @type {boolean}
-     * @private
-     */
-    _initialised = false;
-
-    /**
-     * @type {string}
-     * @private
-     */
-    _versionOutput;
-
-    /**
-     * @type {{major: number, minor: number, revision: number}}
-     * @private
-     */
-    _cliVersion;
+    private _initialised: boolean = false;
+    private _versionOutput?: string;
+    private _cliVersion?: {major: number, minor: number, revision: number};
 
     initIfRequired = async () => {
         if (!this._initialised) {
@@ -26,7 +14,7 @@ class VersionReader {
         }
     }
 
-    invokeVersionCommand = () => {
+    invokeVersionCommand = async (): Promise<string> => {
         return new Promise((resolve, reject) => {
             try {
                 const options = {
@@ -60,16 +48,13 @@ class VersionReader {
             } catch (e) {
                 reject(new Error(`Error spawning Imposter process: ${e}`));
             }
-        })
+        });
     }
 
     /**
      * Determines the version of the CLI subcomponent.
-     *
-     * @param componentName {RegExp}
-     * @returns {{major: number, minor: number, revision: number}}
      */
-    determineVersion = (componentName) => {
+    determineVersion = (componentName: RegExp): SemanticVersion => {
         if (!this._initialised) {
             throw new Error('initIfRequired() not called');
         }
@@ -83,7 +68,7 @@ class VersionReader {
              * ...filtering by componentName, into an array of Strings containing the SemVer components:
              * [ "0", "1", "0" ]
              */
-            const version = this._versionOutput.split('\n')
+            const version = this._versionOutput!!.split('\n')
                 .filter(line => line.match(componentName))
                 .map(cliVersion => cliVersion.split(' ')[1].trim().split('.'))[0];
 
@@ -100,10 +85,8 @@ class VersionReader {
 
     /**
      * Determine the version of the CLI.
-     *
-     * @returns {{major: number, minor: number, revision: number}}
      */
-    determineCliVersion = () => {
+    determineCliVersion = (): SemanticVersion => {
         if (!this._cliVersion) {
             this._cliVersion = this.determineVersion(/imposter-cli/);
         }
@@ -112,15 +95,8 @@ class VersionReader {
 
     /**
      * Runs the `block` if the CLI version is equal to or greater than the specified version.
-     *
-     * @param major {number}
-     * @param minor {number}
-     * @param revision {number}
-     * @param block {function}
-     * @param orElseBlock {function}
-     * @returns {*|undefined}
      */
-    runIfVersionAtLeast = (major, minor, revision, block, orElseBlock = undefined) => {
+    runIfVersionAtLeast = (major: number, minor: number, revision: number, block: () => any, orElseBlock: (() => any) | undefined = undefined): any | undefined => {
         const cliVersion = this.determineCliVersion();
         if (this.versionAtLeast({major, minor, revision}, cliVersion)) {
             return block();
@@ -132,11 +108,8 @@ class VersionReader {
 
     /**
      * Determines if the `test` SemVer version is equal to or greater than `required`.
-     * @param required {{major: number, minor: number, revision: number}}
-     * @param test {{major: number, minor: number, revision: number}}
-     * @returns {boolean}
      */
-    versionAtLeast = (required, test) => {
+    versionAtLeast = (required: SemanticVersion, test: SemanticVersion): boolean => {
         if (test.major > required.major) {
             return true;
         } else if (test.major === required.major) {

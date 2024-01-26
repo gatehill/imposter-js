@@ -2,98 +2,107 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 import {nodeConsole} from "./console";
+import {ConfiguredMock} from "./configured-mock";
+import {MockManager} from "./mock-manager";
+
+type ResponseConfig = {
+    statusCode?: number;
+    headers?: Record<string, string>;
+    staticFile?: string;
+    staticData?: string;
+    template?: boolean;
+    exampleName?: string;
+};
+
+type CaptureConfig = {
+    pathParam?: string;
+    queryParam?: string;
+    requestHeader?: string;
+    jsonPath?: string;
+    store?: string;
+};
+
+type ResourceConfig = {
+    path?: string;
+    method?: string;
+    capture?: Record<string, CaptureConfig>;
+    response?: ResponseConfig;
+};
+
+type PluginConfig = {
+    plugin: string;
+    specFile?: string;
+    resources?: ResourceConfig[];
+    validation?: {
+        request?: boolean;
+        levels?: Record<string, string>;
+    }
+};
 
 class ResourceResponse {
-    response;
+    response: ResponseConfig;
 
-    constructor(response) {
+    constructor(response: ResponseConfig) {
         this.response = response;
     }
 
-    /**
-     * @param statusCode {number}
-     * @return {ResourceResponse}
-     */
-    withStatusCode = (statusCode) => {
+    withStatusCode = (statusCode: number): ResourceResponse => {
         this.response.statusCode = statusCode;
         return this;
     }
 
-    /**
-     * @param headerName {string}
-     * @param headerValue {string}
-     * @return {ResourceResponse}
-     */
-    withHeader = (headerName, headerValue) => {
+    withHeader = (headerName: string, headerValue: string): ResourceResponse => {
         this.response.headers = this.response.headers || {};
         this.response.headers[headerName] = headerValue;
         return this;
     }
 
-    /**
-     * @param data {string}
-     * @return {ResourceResponse}
-     */
-    withData = (data) => {
+    withData = (data: string): ResourceResponse => {
         this.response.staticData = data;
         return this;
     }
 
     /**
      * Only compatible with the 'openapi' plugin.
-     * @param exampleName {string}
-     * @return {ResourceResponse}
      */
-    withExampleName = (exampleName) => {
+    withExampleName = (exampleName: string): ResourceResponse => {
         this.response.exampleName = exampleName;
         return this;
     }
 
-    /**
-     * @param isTemplate {boolean}
-     * @return {ResourceResponse}
-     */
-    template = (isTemplate = true) => {
+    template = (isTemplate: boolean = true): ResourceResponse => {
         this.response.template = isTemplate;
         return this;
     }
 
     /**
      * Convenience function equivalent to calling `withData(templateData).template()`.
-     * @param templateData
-     * @return {ResourceResponse}
      */
-    withTemplateData = (templateData) => {
+    withTemplateData = (templateData: string): ResourceResponse => {
         return this.withData(templateData).template();
     }
 
     /**
      * Convenience function equivalent to calling `withFile(templateFilePath).template()`.
-     * @param templateFilePath
-     * @return {ResourceResponse}
      */
-    withTemplateFile = (templateFilePath) => {
+    withTemplateFile = (templateFilePath: string): ResourceResponse => {
         return this.withFile(templateFilePath).template();
     }
 
-    /**
-     * @param filePath {string}
-     * @return {ResourceResponse}
-     */
-    withFile = (filePath) => {
+    withFile = (filePath: string): ResourceResponse => {
         this.response.staticFile = filePath;
         return this;
     }
 }
 
 class ResourceCapture {
-    capture;
+    capture: Record<string, CaptureConfig>;
 
-    constructor(capture) {
+    constructor(capture: Record<string, CaptureConfig>) {
         this.capture = capture;
     }
 
-    fromPath = (paramName, itemName = null, storeName = null) => {
+    fromPath = (paramName: string, itemName?: string, storeName?: string) => {
         itemName = itemName || paramName;
         this.capture[itemName] = {
             pathParam: paramName,
@@ -102,7 +111,7 @@ class ResourceCapture {
         return this;
     }
 
-    fromQuery = (paramName, itemName = null, storeName = null) => {
+    fromQuery = (paramName: string, itemName?: string, storeName?: string) => {
         itemName = itemName || paramName;
         this.capture[itemName] = {
             queryParam: paramName,
@@ -111,7 +120,7 @@ class ResourceCapture {
         return this;
     }
 
-    fromHeader = (headerName, itemName = null, storeName = null) => {
+    fromHeader = (headerName: string, itemName?: string, storeName?: string) => {
         itemName = itemName || headerName;
         this.capture[itemName] = {
             requestHeader: headerName,
@@ -120,7 +129,7 @@ class ResourceCapture {
         return this;
     }
 
-    fromBodyJsonPath = (jsonPath, itemName = null, storeName = null) => {
+    fromBodyJsonPath = (jsonPath: string, itemName?: string, storeName?: string) => {
         itemName = itemName || 'body';
         this.capture[itemName] = {
             jsonPath: jsonPath,
@@ -131,43 +140,28 @@ class ResourceCapture {
 }
 
 class MockResource {
-    resource;
+    resource: ResourceConfig;
 
-    constructor(resource) {
+    constructor(resource: ResourceConfig) {
         this.resource = resource;
     }
 
-    /**
-     * @param path {string}
-     * @return {MockResource}
-     */
-    withPath = (path) => {
+    withPath = (path: string): MockResource => {
         this.resource.path = path;
         return this;
     }
 
-    /**
-     * @param method {string}
-     * @return {MockResource}
-     */
-    withMethod = (method) => {
+    withMethod = (method: string): MockResource => {
         this.resource.method = method;
         return this;
     }
 
-    /**
-     * @return {ResourceCapture}
-     */
-    captures = () => {
+    captures = (): ResourceCapture => {
         this.resource.capture = this.resource.capture || {};
         return new ResourceCapture(this.resource.capture);
     }
 
-    /**
-     * @param statusCode {number}
-     * @return {ResourceResponse}
-     */
-    responds = (statusCode = 200) => {
+    responds = (statusCode: number = 200): ResourceResponse => {
         this.resource.response = {};
         return new ResourceResponse(this.resource.response)
             .withStatusCode(statusCode);
@@ -175,39 +169,25 @@ class MockResource {
 }
 
 export class MockBuilder {
-    /**
-     * @type {MockManager}
-     */
-    mockManager;
+    mockManager: MockManager;
 
     /**
      * Raw Imposter configuration.
      */
-    config = {};
+    config: Partial<PluginConfig> = {};
 
-    /**
-     * @type {string}
-     */
-    configDir;
+    configDir: string;
 
-    /**
-     * @type {number}
-     */
-    port;
+    port: any;
 
-    /**
-     * @param mockManager {MockManager}
-     */
-    constructor(mockManager) {
+    env?: Record<string, string>;
+
+    constructor(mockManager: MockManager) {
         this.mockManager = mockManager;
         this.configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'imposter'));
     }
 
-    /**
-     * @param port {number}
-     * @return {MockBuilder}
-     */
-    withPort = (port) => {
+    withPort = (port: number): MockBuilder => {
         this.port = port;
         return this;
     }
@@ -226,20 +206,13 @@ export class MockBuilder {
      *     "IMPOSTER_SOME_VAR": "123",
      * })
      * ```
-     *
-     * @param env {Record<string, string>}
-     * @return {MockBuilder}
      */
-    withEnv = (env) => {
+    withEnv = (env: Record<string, string>): MockBuilder => {
         this.env = env;
         return this;
     }
 
-    /**
-     * @param plugin {string}
-     * @return {MockBuilder}
-     */
-    withPlugin = (plugin) => {
+    withPlugin = (plugin: string): MockBuilder => {
         if (this.config.plugin && this.config.plugin !== plugin) {
             throw new Error(`Plugin already set to: ${this.config.plugin}`);
         }
@@ -247,11 +220,7 @@ export class MockBuilder {
         return this;
     }
 
-    /**
-     * @param specFilePath {string}
-     * @return {MockBuilder}
-     */
-    withOpenApiSpec = (specFilePath) => {
+    withOpenApiSpec = (specFilePath: string): MockBuilder => {
         this.withPlugin('openapi');
         const specFileName = path.basename(specFilePath);
         fs.copyFileSync(specFilePath, path.join(this.configDir, specFileName));
@@ -262,10 +231,8 @@ export class MockBuilder {
     /**
      * Enables request validation against the OpenAPI spec.
      * Only compatible with the 'openapi' plugin.
-     *
-     * @return {MockBuilder}
      */
-    withRequestValidation = () => {
+    withRequestValidation = (): MockBuilder => {
         this.withPlugin('openapi');
         this.config.validation = {
             request: true,
@@ -279,20 +246,13 @@ export class MockBuilder {
 
     /**
      * Sets/overwrites configuration with `config`.
-     * @param config
-     * @return {MockBuilder}
      */
-    withConfig = (config) => {
+    withConfig = (config: PluginConfig): MockBuilder => {
         this.config = config;
         return this;
     }
 
-    /**
-     * @param path {string}
-     * @param method {string}
-     * @return {MockResource}
-     */
-    addResource = (path, method = 'GET') => {
+    addResource = (path: string, method: string = 'GET'): MockResource => {
         this.config.resources = this.config.resources || [];
         const resource = {};
         this.config.resources.push(resource);
@@ -301,11 +261,7 @@ export class MockBuilder {
             .withMethod(method);
     }
 
-    /**
-     * @return {ConfiguredMock}
-     * @param options {{logVerbose:boolean}}
-     */
-    build = (options = {}) => {
+    build = (options: { logVerbose?: boolean; } = {}): ConfiguredMock => {
         const mockConfigPath = path.join(this.configDir, 'imposter-config.json');
         const mockConfig = JSON.stringify(this.config, null, '  ');
         fs.writeFileSync(mockConfigPath, mockConfig);
@@ -318,9 +274,8 @@ export class MockBuilder {
 
     /**
      * Convenience function equivalent to calling `build().start()`.
-     * @return {Promise<ConfiguredMock>}
      */
-    start = () => {
+    start = (): Promise<ConfiguredMock> => {
         return this.build().start();
     }
 }

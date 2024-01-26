@@ -7,6 +7,8 @@ module.exports = {
 
     testEnvironment: "node",
     testMatch: [
-        "<rootDir>/src/**/*.test.js"
+        "<rootDir>/src/**/*.test.js",
+        "<rootDir>/src/**/*.test.ts",
     ],
+    preset: "ts-jest",
 };

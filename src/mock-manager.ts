@@ -2,25 +2,10 @@ import {MockBuilder} from "./mock-builder";
 import {ConfiguredMock} from "./configured-mock";
 
 export class MockManager {
-    /**
-     * @type {boolean}
-     * @private
-     */
-    _logVerbose = false;
+    private _logVerbose: boolean = false;
+    private _mocks: ConfiguredMock[] = [];
 
-    /**
-     * @type {ConfiguredMock[]}
-     * @private
-     */
-    _mocks = [];
-
-    /**
-     * @param configDir {string}
-     * @param port {number|null}
-     * @param env {Record<string, string>}
-     * @return {ConfiguredMock}
-     */
-    prepare = (configDir, port = null, env = {}) => {
+    prepare = (configDir: string, port: number | null = null, env: Record<string, string> = {}): ConfiguredMock => {
         const mock = new ConfiguredMock(configDir, port, env);
         if (this._logVerbose) {
             mock.verbose();
@@ -38,13 +23,8 @@ export class MockManager {
      * ```
      * const {mocks}
      * ```
-     *
-     * @param configDir {string}
-     * @param port {number|null}
-     * @param env {Record<string, string>}
-     * @return {Promise<ConfiguredMock>}
      */
-    start = (configDir, port = null, env= {}) => {
+    start = (configDir: string, port: number | null = null, env: Record<string, string> = {}): Promise<ConfiguredMock> => {
         return this.prepare(configDir, port, env).start();
     }
 

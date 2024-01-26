@@ -32,17 +32,11 @@ export class MockManager {
         this._mocks.forEach(mock => mock.stop());
     }
 
-    /**
-     * @return {MockBuilder}
-     */
-    builder = () => {
+    builder = (): MockBuilder => {
         return new MockBuilder(this);
     }
 
-    /**
-     * @return {MockManager}
-     */
-    verbose = () => {
+    verbose = (): MockManager => {
         this._logVerbose = true;
         return this;
     }

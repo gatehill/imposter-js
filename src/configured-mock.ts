@@ -120,8 +120,7 @@ export class ConfiguredMock {
 
     waitUntilReady = async (proc: ChildProcess) => {
         nodeConsole.debug(`Waiting for mock server to come up on port ${this.port}`);
-        let ready = false;
-        while (!ready) {
+        while (true) {
             if (proc.exitCode) {
                 const advice = this.utils.buildDebugAdvice(this.logToFile, this.logVerbose, this.logFilePath);
                 throw new Error(`Failed to start mock engine on port ${this.port}. Exit code: ${proc.exitCode}${advice}`);
@@ -129,13 +128,13 @@ export class ConfiguredMock {
             try {
                 const response = await httpGet(`http://localhost:${this.port}/system/status`);
                 if (response.status === 200) {
-                    ready = true;
+                    nodeConsole.debug('Mock server is up!');
+                    break
                 }
             } catch (ignored) {
-                await this.utils.sleep(200);
             }
+            await this.utils.sleep(200);
         }
-        nodeConsole.debug('Mock server is up!');
     }
 
     stop = () => {
